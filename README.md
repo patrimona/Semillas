@@ -30,7 +30,7 @@ Cada vídeo se abre mediante el parámetro `pieza` de la URL. Estos enlaces se p
 
 Los vídeos se reproducen automáticamente, en bucle y silenciados para permitir la reproducción automática en móviles. Mantienen su proporción sin recortes.
 
-Las llamadas de información comienzan a los 2, 7, 12, 17 y 22 segundos de reproducción acumulada. Cada línea se dibuja en 2,2 segundos y el contenido aparece suavemente; los textos y el espacio de foto permanecen visibles después. Al comenzar una nueva llamada, se ocultan la línea y el punto de la anterior; solo queda la última línea al finalizar. La secuencia continúa entre vueltas del vídeo y se detiene al pausar o esperar datos. Sus puntos de origen son fijos: no realizan seguimiento del objeto. Las posiciones, textos y tiempos se pueden ajustar en `src/App.jsx`.
+Las llamadas de información comienzan a los 2, 7, 12, 17 y 22 segundos de reproducción acumulada. Cada línea se dibuja en 2,2 segundos y el contenido aparece suavemente; los textos y el espacio de foto permanecen visibles después. Un segundo después de que el contenido termine de aparecer, su línea y su punto se desvanecen durante 0,8 segundos. Esto también ocurre con la última llamada. La secuencia continúa entre vueltas del vídeo y se detiene al pausar o esperar datos. Sus puntos de origen son fijos: no realizan seguimiento del objeto. Las posiciones, textos y tiempos se pueden ajustar en `src/App.jsx`.
 
 La portada, los enlaces desconocidos y las piezas `pieza-013`, `pieza-014` y `pieza-015` muestran únicamente negro. También se admiten identificadores del `pieza-001` al `pieza-012`; su numeración provisional sigue el orden de la tabla. Para las tarjetas, se recomienda usar los nombres.
 

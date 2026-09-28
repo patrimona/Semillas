@@ -31,7 +31,7 @@ function VideoWithCallouts({ src }) {
         const delta = currentTime >= previousTime
           ? currentTime - previousTime
           : video.duration - previousTime + currentTime
-        totalTime = Math.min(26, totalTime + delta)
+        totalTime = Math.min(callouts.at(-1).start + 5, totalTime + delta)
         previousTime = currentTime
         setPlaybackTime(totalTime)
       }
@@ -41,11 +41,12 @@ function VideoWithCallouts({ src }) {
     return () => cancelAnimationFrame(frame)
   }, [src])
 
-  const annotations = callouts.map((callout, index) => {
+  const annotations = callouts.map((callout) => {
     const elapsed = playbackTime - callout.start
     const opacity = clamp(elapsed / 0.5)
-    const nextStart = callouts[index + 1]?.start
-    const lineOpacity = nextStart === undefined || playbackTime < nextStart ? opacity : 0
+    // El contenido termina de aparecer a los 3,2 s. Mantener la línea
+    // un segundo más y desvanecerla durante 0,8 s, también en la última.
+    const lineOpacity = opacity * (1 - clamp((elapsed - 4.2) / 0.8))
     return { ...callout, lineOpacity, draw: clamp(elapsed / 2.2), textOpacity: opacity * clamp((elapsed - 2) / 1.2) }
   })
 
