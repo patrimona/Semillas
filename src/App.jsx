@@ -16,9 +16,12 @@ const callouts = [
 ]
 const clamp = (value) => Math.max(0, Math.min(1, value))
 
-function VideoWithCallouts({ src }) {
+function VideoWithCallouts({ src, title }) {
   const videoRef = useRef(null)
   const [playbackTime, setPlaybackTime] = useState(0)
+  const letters = Array.from(title)
+  const titleDuration = 0.3 + letters.length * 0.16
+  const visibleLetters = Math.max(0, Math.floor((playbackTime - 0.3) / 0.16))
 
   useEffect(() => {
     let frame
@@ -31,7 +34,7 @@ function VideoWithCallouts({ src }) {
         const delta = currentTime >= previousTime
           ? currentTime - previousTime
           : video.duration - previousTime + currentTime
-        totalTime = Math.min(callouts.at(-1).start + 5, totalTime + delta)
+        totalTime = Math.min(titleDuration + callouts.at(-1).start - callouts[0].start + 5, totalTime + delta)
         previousTime = currentTime
         setPlaybackTime(totalTime)
       }
@@ -39,10 +42,10 @@ function VideoWithCallouts({ src }) {
     }
     frame = requestAnimationFrame(update)
     return () => cancelAnimationFrame(frame)
-  }, [src])
+  }, [src, titleDuration])
 
   const annotations = callouts.map((callout) => {
-    const elapsed = playbackTime - callout.start
+    const elapsed = playbackTime - titleDuration - (callout.start - callouts[0].start)
     const opacity = clamp(elapsed / 0.5)
     // El contenido termina de aparecer a los 3,2 s. Mantener la línea
     // un segundo más y desvanecerla durante 0,8 s, también en la última.
@@ -52,6 +55,9 @@ function VideoWithCallouts({ src }) {
 
   return <>
     <video ref={videoRef} src={src} autoPlay muted loop playsInline preload="metadata" />
+    <h1 className="piece-title" aria-label={title}>
+      <span aria-hidden="true">{letters.slice(0, visibleLetters).join('')}</span>
+    </h1>
     <div className="callout-overlay" aria-hidden="true">
       <svg className="callout-lines" viewBox="0 0 1000 1000" preserveAspectRatio="none">
         {annotations.map((callout) => <g key={callout.start} opacity={callout.lineOpacity}>
@@ -76,7 +82,7 @@ export default function App() {
   return (
     <main className="video-screen">
       <div className="video-stage">
-        {video && <VideoWithCallouts key={video} src={video} />}
+        {video && <VideoWithCallouts key={video} src={video} title={piece.title} />}
       </div>
     </main>
   )
