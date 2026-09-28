@@ -1,4 +1,4 @@
-# Nexo NFC
+# Semillas
 
 Base de una experiencia web con tarjetas NFC, creada con React, Vite y Tailwind CSS.
 
