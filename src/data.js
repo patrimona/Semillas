@@ -5,7 +5,7 @@ const seeds = [
   { slug: 'cebada', title: 'Cebada', videoFile: 'cebada.mp4' },
   { slug: 'cebolla', title: 'Cebolla', videoFile: 'cebolla.mp4' },
   { slug: 'escanda', title: 'Escanda', videoFile: 'escanda.mp4' },
-  { slug: 'faba', title: 'Faba', videoFile: 'faba.mp4' },
+  { slug: 'faba', title: 'Faba', scientificName: 'Phaseolus vulgaris', videoFile: 'faba.mp4' },
   { slug: 'guisante', title: 'Guisante', videoFile: 'guisante.mp4' },
   { slug: 'maiz', title: 'Maíz', videoFile: 'maiz1.mp4' },
   { slug: 'mijo', title: 'Mijo', videoFile: 'mijo.mp4' },

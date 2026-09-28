@@ -61,6 +61,11 @@ html, body, #root {
   pointer-events: none;
 }
 
+.piece-title-scientific {
+  font-style: italic;
+  text-transform: none;
+}
+
 .callout-overlay {
   position: absolute;
   inset: 0;

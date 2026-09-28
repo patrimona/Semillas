@@ -16,10 +16,11 @@ const callouts = [
 ]
 const clamp = (value) => Math.max(0, Math.min(1, value))
 
-function VideoWithCallouts({ src, title }) {
+function VideoWithCallouts({ src, title, scientificName }) {
   const videoRef = useRef(null)
   const [playbackTime, setPlaybackTime] = useState(0)
-  const letters = Array.from(title.toLocaleUpperCase('es'))
+  const displayTitle = scientificName || title.toLocaleUpperCase('es')
+  const letters = Array.from(displayTitle)
   const titleDuration = 0.3 + letters.length * 0.16
   const visibleLetters = Math.max(0, Math.floor((playbackTime - 0.3) / 0.16))
 
@@ -55,7 +56,7 @@ function VideoWithCallouts({ src, title }) {
 
   return <>
     <video ref={videoRef} src={src} autoPlay muted loop playsInline preload="metadata" />
-    <h1 className="piece-title" aria-label={title}>
+    <h1 className={`piece-title${scientificName ? ' piece-title-scientific' : ''}`} aria-label={displayTitle}>
       <span aria-hidden="true">{letters.slice(0, visibleLetters).join('')}</span>
     </h1>
     <div className="callout-overlay" aria-hidden="true">
@@ -82,7 +83,7 @@ export default function App() {
   return (
     <main className="video-screen">
       <div className="video-stage">
-        {video && <VideoWithCallouts key={video} src={video} title={piece.title} />}
+        {video && <VideoWithCallouts key={video} src={video} title={piece.title} scientificName={piece.scientificName} />}
       </div>
     </main>
   )
