@@ -1,30 +1,44 @@
 # Semillas
 
-Base de una experiencia web con tarjetas NFC, creada con React, Vite y Tailwind CSS.
+Instalación de 15 piezas con vídeos centrados sobre fondo negro, sin texto ni controles visibles.
 
-## Arranque
+## Desarrollo
 
-```bash
+```sh
 npm install
 npm run dev
 ```
 
-## Configurar las tarjetas por número de serie
+## Piezas
 
-Cada elemento de `src/data.js` tiene una propiedad `nfcSerial`. Sustituye su valor por el número físico de tu tarjeta:
+Cada vídeo se abre mediante el parámetro `pieza` de la URL. Estos enlaces se pueden grabar en las tarjetas NFC usando el dominio donde se publique la web:
 
-```js
-{
-  id: 'pieza-001',
-  nfcSerial: '04:A1:B2:C3:D4:E5:80',
-  // ...
-}
+| Pieza | Enlace relativo | Archivo |
+| --- | --- | --- |
+| Algarroba | `?pieza=algarroba` | `algarroba.mp4` |
+| Berenjena | `?pieza=berenjena` | `berenjena.mp4` |
+| Cardo blanco | `?pieza=cardo_blanco` | `cardo_blanco.mp4` |
+| Cebada | `?pieza=cebada` | `cebada.mp4` |
+| Cebolla | `?pieza=cebolla` | `cebolla.mp4` |
+| Escanda | `?pieza=escanda` | `escanda.mp4` |
+| Faba | `?pieza=faba` | `faba.mp4` |
+| Guisante | `?pieza=guisante` | `guisante.mp4` |
+| Maíz | `?pieza=maiz` | `maiz1.mp4` |
+| Mijo | `?pieza=mijo` | `mijo.mp4` |
+| Nabo | `?pieza=nabo` | `nabo.mp4` |
+| Tomate | `?pieza=tomate` | `tomate.mp4` |
+
+Los vídeos se reproducen automáticamente, en bucle y silenciados para permitir la reproducción automática en móviles. Mantienen su proporción sin recortes.
+
+La portada, los enlaces desconocidos y las piezas `pieza-013`, `pieza-014` y `pieza-015` muestran únicamente negro. También se admiten identificadores del `pieza-001` al `pieza-012`; su numeración provisional sigue el orden de la tabla. Para las tarjetas, se recomienda usar los nombres.
+
+Los archivos están en `src/assets` y las asociaciones en `src/data.js`.
+
+## Compilación
+
+```sh
+npm run build
+npm run preview
 ```
 
-Puedes escribirlo con o sin dos puntos y en mayúsculas o minúsculas. La aplicación normaliza el valor antes de compararlo. Si se acerca una tarjeta desconocida, mostrará en pantalla el número detectado para que puedas copiarlo a `src/data.js`.
-
-La tarjeta debe contener al menos un registro NDEF para que Web NFC produzca el evento de lectura. Su contenido no se usa para identificar el elemento: la asociación se realiza únicamente mediante `serialNumber`.
-
-Web NFC funciona en Chrome para Android y requiere HTTPS (o `localhost`). En iPhone/iPad, los navegadores no ofrecen actualmente la API Web NFC genérica; puedes grabar una URL en la tarjeta como alternativa y resolver el elemento desde la ruta de la aplicación.
-
-El botón «Probar demostración» y el círculo del lector permiten simular lecturas durante el desarrollo en escritorio.
+La carpeta `dist` contiene la web compilada, incluidos los vídeos.
