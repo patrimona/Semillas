@@ -19,7 +19,7 @@ const clamp = (value) => Math.max(0, Math.min(1, value))
 function VideoWithCallouts({ src, title }) {
   const videoRef = useRef(null)
   const [playbackTime, setPlaybackTime] = useState(0)
-  const letters = Array.from(title)
+  const letters = Array.from(title.toLocaleUpperCase('es'))
   const titleDuration = 0.3 + letters.length * 0.16
   const visibleLetters = Math.max(0, Math.floor((playbackTime - 0.3) / 0.16))
 

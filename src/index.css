@@ -26,6 +26,7 @@ html, body, #root {
 
 .video-stage {
   position: relative;
+  container-type: inline-size;
   width: 100%;
   max-width: 56.25vh;
   max-width: 56.25dvh;
@@ -52,9 +53,11 @@ html, body, #root {
   margin: 0;
   color: #fff;
   font-family: Arial, sans-serif;
-  font-size: clamp(20px, 3dvh, 36px);
-  font-weight: 500;
-  line-height: 1.2;
+  font-size: clamp(28px, 7.5cqw, 80px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
   pointer-events: none;
 }
 
