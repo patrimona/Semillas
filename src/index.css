@@ -76,13 +76,12 @@ html, body, #root {
 
 .callout-copy {
   position: absolute;
-  left: 12%;
-  width: 76%;
+  width: 32%;
   margin: 0;
-  padding-block: 14px;
+  padding-block: 10px;
   font-family: Arial, sans-serif;
-  font-size: clamp(14px, 1.9vh, 22px);
-  font-size: clamp(14px, 1.9dvh, 22px);
+  font-size: clamp(12px, 1.65vh, 22px);
+  font-size: clamp(12px, 1.65dvh, 22px);
   font-weight: 400;
   line-height: 1.6;
   text-wrap: pretty;
