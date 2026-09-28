@@ -1,6 +1,6 @@
 # Semillas
 
-Instalación de 15 piezas con vídeos centrados sobre fondo negro, sin texto ni controles visibles.
+Instalación de 15 piezas con vídeos centrados sobre fondo negro y sin controles visibles. Tres líneas blancas se dibujan sobre cada vídeo y dan paso a textos provisionales Lorem ipsum.
 
 ## Desarrollo
 
@@ -29,6 +29,8 @@ Cada vídeo se abre mediante el parámetro `pieza` de la URL. Estos enlaces se p
 | Tomate | `?pieza=tomate` | `tomate.mp4` |
 
 Los vídeos se reproducen automáticamente, en bucle y silenciados para permitir la reproducción automática en móviles. Mantienen su proporción sin recortes.
+
+Las llamadas de información siguen el tiempo de reproducción y se reinician en cada vuelta del vídeo. Sus puntos de origen son fijos: no realizan seguimiento del objeto. Las posiciones, textos y tiempos se pueden ajustar en `src/App.jsx`.
 
 La portada, los enlaces desconocidos y las piezas `pieza-013`, `pieza-014` y `pieza-015` muestran únicamente negro. También se admiten identificadores del `pieza-001` al `pieza-012`; su numeración provisional sigue el orden de la tabla. Para las tarjetas, se recomienda usar los nombres.
 
