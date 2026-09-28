@@ -9,7 +9,7 @@ const videos = import.meta.glob('./assets/*.mp4', {
 
 const callouts = [
   { start: 2, point: [440, 470], path: 'M440 470 L320 250 L80 250', left: '8%', bottom: '75%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  { start: 7, point: [560, 470], path: 'M560 470 L700 250 L920 250', left: '60%', bottom: '75%', type: 'photo' },
+  { start: 7, point: [560, 470], path: 'M560 470 L700 310 L920 310', left: '60%', bottom: '69%', type: 'photo' },
   { start: 12, point: [430, 530], path: 'M430 530 L320 640 L80 640', left: '8%', top: '64%', text: 'Ut enim ad minim veniam, quis nostrud exercitation.' },
   { start: 17, point: [570, 530], path: 'M570 530 L700 640 L920 640', left: '60%', top: '64%', text: 'Duis aute irure dolor in reprehenderit in voluptate.' },
   { start: 22, point: [500, 550], path: 'M500 550 L500 820 L340 820', left: '34%', top: '82%', text: 'Excepteur sint occaecat cupidatat non proident.' },
