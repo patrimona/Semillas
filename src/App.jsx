@@ -8,24 +8,32 @@ const videos = import.meta.glob('./assets/*.mp4', {
 })
 
 const callouts = [
-  { start: 0.06, point: [440, 470], path: 'M440 470 L320 250 L80 250', left: '8%', bottom: '75%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  { start: 0.20, point: [560, 470], path: 'M560 470 L700 250 L920 250', left: '60%', bottom: '75%', text: 'Sed do eiusmod tempor incididunt ut labore et dolore.' },
-  { start: 0.34, point: [430, 530], path: 'M430 530 L320 640 L80 640', left: '8%', top: '64%', text: 'Ut enim ad minim veniam, quis nostrud exercitation.' },
-  { start: 0.48, point: [570, 530], path: 'M570 530 L700 640 L920 640', left: '60%', top: '64%', text: 'Duis aute irure dolor in reprehenderit in voluptate.' },
-  { start: 0.62, point: [500, 550], path: 'M500 550 L500 820 L340 820', left: '34%', top: '82%', text: 'Excepteur sint occaecat cupidatat non proident.' },
+  { start: 2, point: [440, 470], path: 'M440 470 L320 250 L80 250', left: '8%', bottom: '75%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+  { start: 7, point: [560, 470], path: 'M560 470 L700 250 L920 250', left: '60%', bottom: '75%', type: 'photo' },
+  { start: 12, point: [430, 530], path: 'M430 530 L320 640 L80 640', left: '8%', top: '64%', text: 'Ut enim ad minim veniam, quis nostrud exercitation.' },
+  { start: 17, point: [570, 530], path: 'M570 530 L700 640 L920 640', left: '60%', top: '64%', text: 'Duis aute irure dolor in reprehenderit in voluptate.' },
+  { start: 22, point: [500, 550], path: 'M500 550 L500 820 L340 820', left: '34%', top: '82%', text: 'Excepteur sint occaecat cupidatat non proident.' },
 ]
 const clamp = (value) => Math.max(0, Math.min(1, value))
 
 function VideoWithCallouts({ src }) {
   const videoRef = useRef(null)
-  const [progress, setProgress] = useState(0)
+  const [playbackTime, setPlaybackTime] = useState(0)
 
   useEffect(() => {
     let frame
+    let previousTime = 0
+    let totalTime = 0
     const update = () => {
       const video = videoRef.current
       if (video && Number.isFinite(video.duration) && video.duration > 0) {
-        setProgress((current) => Math.max(current, video.currentTime / video.duration))
+        const currentTime = video.currentTime
+        const delta = currentTime >= previousTime
+          ? currentTime - previousTime
+          : video.duration - previousTime + currentTime
+        totalTime = Math.min(26, totalTime + delta)
+        previousTime = currentTime
+        setPlaybackTime(totalTime)
       }
       frame = requestAnimationFrame(update)
     }
@@ -34,9 +42,9 @@ function VideoWithCallouts({ src }) {
   }, [src])
 
   const annotations = callouts.map((callout) => {
-    const elapsed = progress - callout.start
-    const opacity = clamp(elapsed / 0.012)
-    return { ...callout, opacity, draw: clamp(elapsed / 0.065), textOpacity: opacity * clamp((elapsed - 0.055) / 0.035) }
+    const elapsed = playbackTime - callout.start
+    const opacity = clamp(elapsed / 0.5)
+    return { ...callout, opacity, draw: clamp(elapsed / 2.2), textOpacity: opacity * clamp((elapsed - 2) / 1.2) }
   })
 
   return <>
@@ -49,7 +57,9 @@ function VideoWithCallouts({ src }) {
       </svg>
       {annotations.map((callout) => <div key={callout.start}>
         <span className="callout-point" style={{ left: `${callout.point[0] / 10}%`, top: `${callout.point[1] / 10}%`, opacity: callout.opacity }} />
-        <p className="callout-copy" style={{ left: callout.left, top: callout.top, bottom: callout.bottom, opacity: callout.textOpacity }}>{callout.text}</p>
+        {callout.type === 'photo'
+          ? <div className="callout-photo" style={{ left: callout.left, top: callout.top, bottom: callout.bottom, opacity: callout.textOpacity }} />
+          : <p className="callout-copy" style={{ left: callout.left, top: callout.top, bottom: callout.bottom, opacity: callout.textOpacity }}>{callout.text}</p>}
       </div>)}
     </div>
   </>
