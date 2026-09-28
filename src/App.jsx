@@ -8,9 +8,9 @@ const videos = import.meta.glob('./assets/*.mp4', {
 })
 
 const callouts = [
-  { start: 0.08, point: [440, 470], path: 'M440 470 L660 220 L120 220', bottom: '78%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  { start: 0.36, point: [560, 530], path: 'M560 530 L340 740 L880 740', top: '74%', text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
-  { start: 0.64, point: [480, 490], path: 'M480 490 L700 220 L120 220', bottom: '78%', text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco.' },
+  { start: 0.08, point: [440, 470], path: 'M440 470 L300 220', bottom: '78%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+  { start: 0.36, point: [560, 530], path: 'M560 530 L700 740', top: '74%', text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+  { start: 0.64, point: [480, 490], path: 'M480 490 L620 220', bottom: '78%', text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco.' },
 ]
 
 const clamp = (value) => Math.max(0, Math.min(1, value))
