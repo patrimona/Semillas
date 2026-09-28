@@ -41,22 +41,24 @@ function VideoWithCallouts({ src }) {
     return () => cancelAnimationFrame(frame)
   }, [src])
 
-  const annotations = callouts.map((callout) => {
+  const annotations = callouts.map((callout, index) => {
     const elapsed = playbackTime - callout.start
     const opacity = clamp(elapsed / 0.5)
-    return { ...callout, opacity, draw: clamp(elapsed / 2.2), textOpacity: opacity * clamp((elapsed - 2) / 1.2) }
+    const nextStart = callouts[index + 1]?.start
+    const lineOpacity = nextStart === undefined || playbackTime < nextStart ? opacity : 0
+    return { ...callout, lineOpacity, draw: clamp(elapsed / 2.2), textOpacity: opacity * clamp((elapsed - 2) / 1.2) }
   })
 
   return <>
     <video ref={videoRef} src={src} autoPlay muted loop playsInline preload="metadata" />
     <div className="callout-overlay" aria-hidden="true">
       <svg className="callout-lines" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-        {annotations.map((callout) => <g key={callout.start} opacity={callout.opacity}>
+        {annotations.map((callout) => <g key={callout.start} opacity={callout.lineOpacity}>
           <path d={callout.path} pathLength="1" strokeDasharray="1" strokeDashoffset={1 - callout.draw} />
         </g>)}
       </svg>
       {annotations.map((callout) => <div key={callout.start}>
-        <span className="callout-point" style={{ left: `${callout.point[0] / 10}%`, top: `${callout.point[1] / 10}%`, opacity: callout.opacity }} />
+        <span className="callout-point" style={{ left: `${callout.point[0] / 10}%`, top: `${callout.point[1] / 10}%`, opacity: callout.lineOpacity }} />
         {callout.type === 'photo'
           ? <div className="callout-photo" style={{ left: callout.left, top: callout.top, bottom: callout.bottom, opacity: callout.textOpacity }} />
           : <p className="callout-copy" style={{ left: callout.left, top: callout.top, bottom: callout.bottom, opacity: callout.textOpacity }}>{callout.text}</p>}
