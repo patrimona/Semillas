@@ -8,9 +8,9 @@ const videos = import.meta.glob('./assets/*.mp4', {
 })
 
 const callouts = [
-  { start: 0.08, point: [440, 400], path: 'M440 400 L320 250 L90 250', left: '9%', top: '25%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  { start: 0.36, point: [560, 470], path: 'M560 470 L700 350 L910 350', left: '70%', top: '35%', text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
-  { start: 0.64, point: [470, 600], path: 'M470 600 L320 760 L90 760', left: '9%', top: '76%', text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco.' },
+  { start: 0.08, point: [440, 470], path: 'M440 470 L660 220 L120 220', bottom: '78%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+  { start: 0.36, point: [560, 530], path: 'M560 530 L340 740 L880 740', top: '74%', text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+  { start: 0.64, point: [480, 490], path: 'M480 490 L700 220 L120 220', bottom: '78%', text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco.' },
 ]
 
 const clamp = (value) => Math.max(0, Math.min(1, value))
@@ -48,7 +48,7 @@ function VideoWithCallouts({ src }) {
       </svg>
       {annotations.map((callout) => <div key={callout.start}>
         <span className="callout-point" style={{ left: `${callout.point[0] / 10}%`, top: `${callout.point[1] / 10}%`, opacity: callout.opacity }} />
-        <p className="callout-copy" style={{ left: callout.left, top: callout.top, opacity: callout.textOpacity }}>{callout.text}</p>
+        <p className="callout-copy" style={{ top: callout.top, bottom: callout.bottom, opacity: callout.textOpacity }}>{callout.text}</p>
       </div>)}
     </div>
   </>
