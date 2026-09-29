@@ -2,28 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Project Helvetica Neue';
+  src: url('./fonts/HelveticaNeue-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Project Helvetica Neue';
+  src: url('./fonts/HelveticaNeue-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Project Helvetica Neue';
+  src: url('./fonts/HelveticaNeue-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Project Helvetica Neue';
+  src: url('./fonts/HelveticaNeue-BoldItalic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+
 :root {
+  --page-background: #000;
+  --page-foreground: #fff;
   color-scheme: dark;
-  background: #000;
+  background: var(--page-background);
 }
-
 * { box-sizing: border-box; }
-
-html, body, #root {
-  margin: 0;
-  width: 100%;
-  min-height: 100%;
-  background: #000;
-}
-
+html, body, #root { margin: 0; width: 100%; min-height: 100%; background: var(--page-background); }
 .video-screen {
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  background: #000;
+  background: var(--page-background);
 }
-
+.video-screen-white { --page-background: #fff; --page-foreground: #000; color-scheme: light; }
 .video-stage {
   position: relative;
   container-type: inline-size;
@@ -36,89 +63,125 @@ html, body, #root {
   display: grid;
   place-items: center;
 }
-
-.video-stage video {
-  display: block;
-  width: 78%;
-  height: 42%;
-  object-fit: contain;
-}
-
+.video-stage video { display: block; width: 78%; height: 42%; object-fit: contain; }
+.piece-heading { position: absolute; top: 3%; left: 3%; width: 94%; z-index: 2; pointer-events: none; }
 .piece-title {
-  position: absolute;
-  top: 3%;
-  left: 3%;
-  max-width: 94%;
-  z-index: 2;
   margin: 0;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  font-size: clamp(28px, 7.5cqw, 80px);
+  color: var(--page-foreground);
+  font-family: 'Project Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(32px, 8.5cqw, 90px);
   font-weight: 700;
+  white-space: nowrap;
   line-height: 1.05;
   letter-spacing: -0.03em;
   text-transform: uppercase;
   pointer-events: none;
 }
-
-.piece-title-scientific {
-  font-style: italic;
-  text-transform: none;
+.piece-title-measure { position: absolute; visibility: hidden; font-size: clamp(32px, 8.5cqw, 90px); width: max-content; }
+.piece-title-scientific { font-style: italic; text-transform: none; }
+.piece-common-name {
+  margin: 0.5em 0 0;
+  color: var(--page-foreground);
+  font-family: 'Project Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(18px, 4.6cqw, 46px);
+  font-weight: 400;
+  line-height: 1.2;
 }
-
-.callout-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  color: #fff;
-}
-
+.callout-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; color: var(--page-foreground); }
 .callout-lines {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   fill: none;
-  stroke: #fff;
-  stroke-width: 1;
+  stroke: var(--page-foreground);
+  stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
-.callout-lines path { vector-effect: non-scaling-stroke; }
-
-.callout-point {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: #fff;
-}
-
+.callout-point { position: absolute; width: 10px; height: 10px; transform: translate(-50%, -50%); border: 1px solid var(--page-foreground); background: var(--page-background); }
+.callout-point::after { content: ''; position: absolute; inset: 2px; background: var(--page-foreground); }
 .callout-copy {
   position: absolute;
   width: 32%;
   margin: 0;
   padding-block: 10px;
-  font-family: Arial, sans-serif;
-  font-size: clamp(12px, 1.65vh, 22px);
-  font-size: clamp(12px, 1.65dvh, 22px);
+  font-family: 'Project Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(16px, 2vh, 26px);
+  font-size: clamp(16px, 2dvh, 26px);
   font-weight: 400;
   line-height: 1.6;
   text-wrap: pretty;
-  text-shadow: 0 1px 6px #000;
+  text-shadow: none;
+  font-synthesis: none;
+  isolation: isolate;
 }
-
-.callout-photo {
+.callout-copy-boxed::before, .callout-copy-boxed::after {
+  content: '';
   position: absolute;
-  width: 32%;
-  aspect-ratio: 1;
-  border: 1px solid rgb(255 255 255 / 65%);
-  background: #000;
+  pointer-events: none;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .callout-lines path { stroke-dashoffset: 0; }
+.callout-text { display: block; }
+.callout-anchor { position: absolute; left: 0; top: calc(0.5em - 8px); width: 0; height: 0; }
+.callout-copy:not(.callout-copy-info) .callout-anchor { top: 2px; }
+/* Keep the connections on the frame, slightly in from each corner. */
+.callout-copy.callout-copy-simple .callout-anchor { left: 85%; top: 100%; }
+.callout-copy.callout-copy-boxed .callout-anchor { left: 15%; top: -26px; }
+.callout-copy-simple::before {
+  content: '';
+  position: absolute;
+  inset: 0 -8px;
+  z-index: -2;
+  background: var(--page-foreground);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  pointer-events: none;
 }
+.callout-copy-simple::after {
+  content: '';
+  position: absolute;
+  inset: 1px -7px;
+  z-index: -1;
+  background: var(--page-background);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+  pointer-events: none;
+}
+.callout-copy-boxed::before {
+  inset: -26px -8px 0;
+  z-index: -2;
+  background:
+    linear-gradient(to right, var(--page-foreground) 0 48%, transparent 48% 72%, var(--page-foreground) 72%) top / 100% 1px no-repeat,
+    linear-gradient(var(--page-foreground), var(--page-foreground)) bottom / 100% calc(100% - 1px) no-repeat;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+.callout-copy-boxed::after {
+  inset: -25px -7px 1px;
+  z-index: -1;
+  background: var(--page-background);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+}
+.callout-card-heading {
+  position: absolute;
+  top: -21px;
+  left: 0;
+  right: 0;
+  min-height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1px 4px;
+  background: color-mix(in srgb, var(--page-foreground) 20%, var(--page-background));
+  font-size: clamp(16px, 4cqw, 26px);
+  line-height: 1;
+  white-space: normal;
+  text-transform: uppercase;
+}
+.callout-card-heading strong { font-weight: 400; }
+.callout-copy-info {
+  white-space: pre-line;
+  font-size: clamp(16px, 4.2cqw, 28px);
+  font-size: round(nearest, clamp(16px, 4.2cqw, 28px), 1px);
+  line-height: 1.25;
+  padding-block: 0.5em;
+  text-wrap: pretty;
+}
+@media (prefers-reduced-motion: reduce) { .callout-lines path { stroke-dashoffset: 0; } }

@@ -1,6 +1,6 @@
 # Semillas
 
-Instalación de 15 piezas con vídeos centrados sobre fondo negro y sin controles visibles. Cinco líneas blancas dan paso a cuatro bloques compactos de texto provisional Lorem ipsum y un espacio cuadrado vacío para una futura foto, arriba a la derecha.
+Instalación de 15 piezas, doce de ellas con vídeos centrados sobre fondo blanco y sin controles visibles. Cinco líneas negras dan paso a cuatro bloques compactos de información y un espacio cuadrado vacío para una futura foto, arriba a la derecha. La algarroba tiene su ficha completa; las demás conservan textos provisionales.
 
 ## Desarrollo
 
@@ -35,6 +35,21 @@ El título aparece arriba a la izquierda, letra a letra (160 ms por letra tras u
 La portada, los enlaces desconocidos y las piezas `pieza-013`, `pieza-014` y `pieza-015` muestran únicamente negro. También se admiten identificadores del `pieza-001` al `pieza-012`; su numeración provisional sigue el orden de la tabla. Para las tarjetas, se recomienda usar los nombres.
 
 Los archivos están en `src/assets` y las asociaciones en `src/data.js`.
+
+## Fondo blanco
+
+Los enlaces habituales muestran las doce semillas sobre blanco, con textos y
+líneas negros. Para comparar con el original, añade `&fondo=negro` a cualquier
+enlace, por ejemplo `?pieza=algarroba&fondo=negro`.
+
+Las copias `src/assets/*-blanco.mp4` conservan los fotogramas, la resolución y
+la velocidad de sus originales. `python scripts/white-background.py --all`
+genera las copias que falten; para regenerar una, usa su nombre de archivo sin
+extensión, por ejemplo `python scripts/white-background.py cebolla`.
+El script utiliza OpenCV, NumPy e imageio-ffmpeg instalados en `.tools/video`.
+La máscara sigue el contorno exterior para preservar las manchas oscuras
+interiores, con umbrales específicos para cebolla, nabo y cardo blanco.
+Las hojas de revisión se guardan en `.tools/white-review`.
 
 ## Compilación
 
