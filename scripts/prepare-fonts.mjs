@@ -13,7 +13,9 @@ const checksum = bytes => {
   return sum
 }
 
-for (const [index, name] of ['Regular', 'Bold', 'Italic', 'BoldItalic'].entries()) {
+const faces = [[0, 'Regular'], [1, 'Bold'], [2, 'Italic'], [3, 'BoldItalic'], [12, 'Thin']]
+for (const [index, name] of faces) {
+  if (process.argv.length > 2 && !process.argv.slice(2).includes(name)) continue
   const start = source.readUInt32BE(12 + index * 4)
   const tables = new Map()
   for (let i = 0; i < source.readUInt16BE(start + 4); i++) {

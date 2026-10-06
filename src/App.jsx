@@ -1,93 +1,111 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { findPiece } from './data'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { elements, findPiece } from './data'
+import mapImage from './assets/mapa.jpg'
+import NfcPanel from './NfcPanel.jsx'
+import DesktopRuntime from './DesktopRuntime.jsx'
+import IdleScreen from './IdleScreen.jsx'
 
+// Catálogo de vídeos: Vite convierte cada MP4 de assets en una URL utilizable.
+// Los nombres, archivos y datos de cada semilla se definen en src/data.js.
 const videos = import.meta.glob('./assets/*.mp4', {
   eager: true,
   query: '?url',
   import: 'default',
 })
 
-const callouts = [
-  { start: 2, point: [440, 470], path: 'M440 470 L280 250 L80 250', left: '8%', bottom: '75%', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  { start: 7, point: [560, 470], path: 'M560 470 L740 310 L920 310', left: '60%', bottom: '69%', text: '' },
-  { start: 12, point: [430, 530], path: 'M430 530 L280 640 L80 640', left: '8%', top: '64%', text: 'Ut enim ad minim veniam, quis nostrud exercitation.' },
-  { start: 17, point: [570, 530], path: 'M570 530 L740 710 L920 710', left: '60%', top: '71%', text: 'Duis aute irure dolor in reprehenderit in voluptate.' },
-  { start: 22, point: [500, 550], path: 'M500 550 L500 820', left: '34%', top: '82%', text: 'Excepteur sint occaecat cupidatat non proident.' },
+// Destinos: centro horizontal y borde superior, en porcentajes del escenario.
+// Distribución de la referencia: taxonomía arriba a la derecha, nombre a la
+// izquierda, usos abajo a la izquierda, muestra a la derecha y tamaño abajo.
+const defaultCardPositions = [
+  { x: 74, y: 11, width: 36 },
+  { x: 18, y: 36, width: 24 },
+  { x: 21, y: 65, width: 30 },
+  { x: 84, y: 50, width: 22 },
+  { x: 54.5, y: 61.5, width: 28 },
 ]
-const clamp = (value) => Math.max(0, Math.min(1, value))
+const SEED_POINTS = [[54,36], [40,45], [44,54], [61,53], [53,57.5]]
+const CARD_INTERVAL = 7 // Segundos entre tarjetas.
+const TITLE_PAUSE = 2.5 // Pausa tras el título antes de la primera cartela.
+const CARD_DURATION = 4.5 // Recorrido algo más pausado, con arranque y llegada suaves.
+const clamp = value => Math.max(0, Math.min(1, value))
+const smoothstep = value => value * value * (3 - 2 * value)
+const smootherstep = value => value ** 3 * (value * (value * 6 - 15) + 10)
 
-function VideoWithCallouts({ src, title, scientificName, info }) {
+// La tarjeta se aleja en la dirección de su flecha. El punto de la semilla y
+// el ángulo no cambian; la punta llega al primer borde, sin atravesar el cuadro.
+function cardMotion(position, index, elapsed, reducedMotion, geometry, sourcePoint = SEED_POINTS[index]) {
+  const size = geometry.cards[index]
+  const opacity = smoothstep(clamp(elapsed / .4))
+  if (!size || !geometry.width || !geometry.height) return { x: position.x, y: position.y, opacity: 0 }
+  const sourceX = sourcePoint[0] / 100 * geometry.width
+  const sourceY = sourcePoint[1] / 100 * geometry.height
+  const centerX = position.x / 100 * geometry.width
+  // Los textos largos suben solo lo necesario para dejar libre el pie.
+  const top = Math.min(position.y / 100 * geometry.height, geometry.height * .935 - size.height - geometry.height * .012)
+  const centerY = top + size.height / 2
+  const dx = sourceX - centerX
+  const dy = sourceY - centerY
+  const edge = Math.min(size.width / 2 / Math.max(Math.abs(dx), .001), size.height / 2 / Math.max(Math.abs(dy), .001))
+  const finalX = centerX + dx * edge
+  const finalY = centerY + dy * edge
+  // Comienza a desplazarse durante la aparición, sin una pausa intermedia.
+  const progress = smootherstep(clamp((elapsed - .15) / (CARD_DURATION - .15)))
+  // La primera cartela nace a la derecha del título, con un margen del 2%.
+  const clearance = centerX - size.width / 2 - geometry.titleRight - geometry.width * .02
+  const initialTravel = index === 0
+    ? Math.max(.3, clamp(1 - Math.max(0, clearance) / Math.max(.001, finalX - sourceX)))
+    : .3
+  const travel = reducedMotion ? 1 : initialTravel + (1 - initialTravel) * progress
+  const offsetX = (sourceX - finalX) * (1 - travel)
+  const offsetY = (sourceY - finalY) * (1 - travel)
+  const growth = reducedMotion ? 1 : smoothstep(clamp(elapsed / .65))
+  return {
+    x: (centerX + offsetX) / geometry.width * 100,
+    y: (top + offsetY) / geometry.height * 100,
+    opacity,
+    line: {
+      x: sourceX, y: sourceY,
+      path: `M${sourceX} ${sourceY} L${sourceX + (finalX - sourceX) * travel * growth} ${sourceY + (finalY - sourceY) * travel * growth}`,
+    },
+  }
+}
+function VideoWithCallouts({ src, title, subtitleName, scientificName, info, number, editorial, videoFraming, seedAnchors, cardOverrides }) {
+  const cardPositions = defaultCardPositions.map((position, index) => ({ ...position, ...cardOverrides?.[index] }))
+  // Referencias a elementos HTML para consultar el vídeo y medir textos y posiciones.
   const videoRef = useRef(null)
   const headingRef = useRef(null)
   const titleMeasureRef = useRef(null)
   const overlayRef = useRef(null)
-  const copyRefs = useRef({})
-  const [connectorPaths, setConnectorPaths] = useState({})
-  const [titleSize, setTitleSize] = useState()
+  const cardRefs = useRef([])
+  const [geometry, setGeometry] = useState({ width: 0, height: 0, cards: [] })
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const arrowId = useId()
+  // Estado del tamaño del título y del reloj compartido por todas las tarjetas.
+  const [titleSize, setTitleSize] = useState({})
   const [playbackTime, setPlaybackTime] = useState(0)
-  const displayTitle = scientificName || title.toLocaleUpperCase('es')
+  // Título letra a letra: espera inicial de 0,3 s y 0,16 s por carácter.
+  // Si hay nombre científico, se usa como título y el nombre común queda debajo.
+  // La referencia usa género y especie en cursiva, con la autoría en letra normal.
+  const displayTitle = scientificName || title
+  const [genus, species = '', ...authorWords] = scientificName ? scientificName.split(' ') : [title]
+  const author = authorWords.join(' ')
   const letters = Array.from(displayTitle)
   const titleDuration = 0.3 + letters.length * 0.16
   const visibleLetters = Math.max(0, Math.floor((playbackTime - 0.3) / 0.16))
 
-  useLayoutEffect(() => {
-    let active = true
-    const alignConnectors = () => {
-      if (!active) return
-      const bounds = overlayRef.current.getBoundingClientRect()
-      if (!bounds.width || !bounds.height) return
-      // Use screen pixels for both geometry and the animated stroke length.
-      const x = value => value - bounds.left
-      const y = value => value - bounds.top
-      const paths = {}
-      for (const callout of callouts) {
-        const copy = copyRefs.current[callout.start]
-        if (!copy) continue
-        const content = copy.querySelector('.callout-text').getBoundingClientRect()
-        const anchor = copy.querySelector('.callout-anchor').getBoundingClientRect()
-        const px = callout.point[0] * bounds.width / 1000
-        const py = callout.point[1] * bounds.height / 1000
-        const sourceX = bounds.left + px
-        const endX = x(anchor.left)
-        const endY = y(anchor.top)
-        if (callout.start === 2 || callout.start === 17) {
-          paths[callout.start] = `M${px} ${py} L${endX} ${endY}`
-        } else if (callout.start === 22) {
-          // Keep the descending segment outside the sample card's actual frame.
-          const sample = copyRefs.current[17]
-          const frameLeft = sample
-            ? sample.getBoundingClientRect().left + parseFloat(getComputedStyle(sample, '::before').left)
-            : bounds.right
-          const elbowX = Math.min(Math.max(sourceX, content.right), frameLeft - 12)
-          paths[callout.start] = `M${px} ${py} L${x(elbowX)} ${endY} L${endX} ${endY}`
-        } else {
-          const left = content.left < sourceX
-          const elbowX = left
-            ? Math.min(sourceX - 24, content.left + content.width * .6)
-            : Math.max(sourceX + 24, content.right - content.width * .6)
-          paths[callout.start] = `M${px} ${py} L${x(elbowX)} ${endY} L${endX} ${endY}`
-        }
-      }
-      setConnectorPaths(paths)
-    }
-    const observer = new ResizeObserver(alignConnectors)
-    observer.observe(overlayRef.current)
-    for (const node of Object.values(copyRefs.current)) if (node) observer.observe(node)
-
-    alignConnectors()
-    document.fonts.ready.then(alignConnectors)
-    return () => { active = false; observer.disconnect() }
-  }, [src, info])
-
+  // Ajusta cada línea por separado para que quepan también nombres científicos largos.
   useEffect(() => {
     let active = true
     const fitTitle = () => {
       if (!active) return
-      const measure = titleMeasureRef.current
+      const [genusMeasure, speciesMeasure, authorMeasure] = titleMeasureRef.current.children
       const available = headingRef.current.clientWidth
-      const baseSize = parseFloat(getComputedStyle(measure).fontSize)
-      const fullWidth = measure.getBoundingClientRect().width
-      setTitleSize(baseSize * Math.min(1, available / fullWidth) * 0.97)
+      const fit = (node, width) => parseFloat(getComputedStyle(node).fontSize) * Math.min(1, width / Math.max(1, node.getBoundingClientRect().width))
+      setTitleSize({
+        genus: fit(genusMeasure, available),
+        species: fit(speciesMeasure, available * .98),
+        author: fit(authorMeasure, available * .98),
+      })
     }
     const observer = new ResizeObserver(fitTitle)
     observer.observe(headingRef.current)
@@ -98,85 +116,180 @@ function VideoWithCallouts({ src, title, scientificName, info }) {
       observer.disconnect()
     }
   }, [displayTitle])
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReducedMotion(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
 
+  // Mide los tamaños sin transformar; las flechas usan la misma posición
+  // que cada tarjeta en cada fotograma, también al redimensionar la pantalla.
+  useLayoutEffect(() => {
+    const align = () => {
+      const { width, height, left } = overlayRef.current.getBoundingClientRect()
+      const titleRight = headingRef.current.getBoundingClientRect().right - left
+      setGeometry({ width, height, titleRight, cards: cardRefs.current.map(card => ({ width: card.offsetWidth, height: card.offsetHeight })) })
+    }
+    const observer = new ResizeObserver(align)
+    observer.observe(overlayRef.current)
+    observer.observe(headingRef.current)
+    cardRefs.current.forEach(card => observer.observe(card))
+    align()
+    return () => observer.disconnect()
+  }, [info])
+  // Acumula el tiempo reproducido: las tarjetas esperan si el vídeo se pausa.
   useEffect(() => {
     let frame
     let previousTime = 0
     let totalTime = 0
+    const sequenceDuration = titleDuration + TITLE_PAUSE + (cardPositions.length - 1) * CARD_INTERVAL + CARD_DURATION + 1
     const update = () => {
       const video = videoRef.current
       if (video && Number.isFinite(video.duration) && video.duration > 0) {
         const currentTime = video.currentTime
+        // Si currentTime retrocede, se interpreta como el comienzo de otra vuelta.
         const delta = currentTime >= previousTime
           ? currentTime - previousTime
           : video.duration - previousTime + currentTime
-        totalTime = Math.min(titleDuration + callouts.at(-1).start - callouts[0].start + 5, totalTime + delta)
+        // Deja de acumular cuando ha terminado la última animación; los textos permanecen.
+        totalTime = Math.min(sequenceDuration, totalTime + delta)
         previousTime = currentTime
         setPlaybackTime(totalTime)
       }
-      frame = requestAnimationFrame(update)
+      if (totalTime < sequenceDuration) frame = requestAnimationFrame(update)
     }
     frame = requestAnimationFrame(update)
     return () => cancelAnimationFrame(frame)
   }, [src, titleDuration])
-
-  const pieceCallouts = info ? [
-    { ...callouts[0], bottom: '66%', width: '46%', path: 'M440 470 L280 340 L80 340', text: `Familia: ${info.family}\nGénero: ${info.genus}\nEspecie: ${info.species}` },
-    { ...callouts[1], bottom: '66%', path: 'M560 470 L740 340 L920 340' },
-    { ...callouts[2], top: '58%', width: '40%', path: 'M430 530 L340 580 L80 580', text: `Nombres comunes: ${info.commonNames}\nTamaño medio: ${info.averageSize}` },
-    { ...callouts[3], left: '62%', top: '65%', width: '34%', path: 'M570 530 L660 650 L960 650', text: `Recolección de la muestra:\n${info.collectedOn}\n${info.collectedAt}\nDepósito en Svalbard:\n${info.depositedOn}` },
-    { ...callouts[4], left: '8%', top: '79%', width: '47%', path: 'M500 550 L500 790', text: info.uses },
-  ] : callouts
-
-  const annotations = pieceCallouts.filter(callout => callout.text).map((callout) => {
-    const elapsed = playbackTime - titleDuration - (callout.start - callouts[0].start)
-    const opacity = clamp(elapsed / 0.5)
-    // El contenido termina de aparecer a los 3,2 s. Mantener la línea
-    // un segundo más y desvanecerla durante 0,8 s, también en la última.
-    const lineOpacity = opacity * (1 - clamp((elapsed - 4.2) / 0.8))
-    return { ...callout, lineOpacity, draw: clamp(elapsed / 2.2), textOpacity: opacity * clamp(elapsed - 2.2) }
-  })
-
+  // Contenido de las tarjetas; los datos se editan en src/data.js.
+  const cards = info ? [
+    {title:'Taxonomía',layout:'table',fields:[['Familia',info.family],['Género',info.genus],['Especie',info.species]]},
+    {title:'La semilla',fields:[[info.commonNamesLabel || 'Nombres comunes',info.commonNames],['Tamaño medio',info.averageSize]]},
+    {title:info.usesTitle || 'Usos',text:info.uses},
+    {title:'Muestra',fields:[['Recolección',`${info.collectedOn}\n${info.collectedAt}`],['Depósito en Svalbard',info.depositedOn]]},
+    {title:info.originTitle || 'Origen',text:info.origin},
+  ] : [
+    {title:'Taxonomía',text:'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'},
+    {title:'Nombre común',text:title},
+    {title:'Usos',text:'Excepteur sint occaecat cupidatat non proident.'},
+    {title:'Muestra',text:'Duis aute irure dolor in reprehenderit in voluptate.'},
+    {title:'Tamaño',text:'Información pendiente.'},
+  ]
+  const motions = cardPositions.map((position, index) => cardMotion(position, index, playbackTime - titleDuration - TITLE_PAUSE - index * CARD_INTERVAL, reducedMotion, geometry, seedAnchors?.[index]))
+  const connectors = motions.map(motion => motion.line)
+  // Compensa el cambio de encuadre manteniendo el tamaño visible anterior.
+  const framingScale = videoFraming && geometry.width && geometry.height
+    ? videoFraming.contentScale
+      * Math.min(geometry.width, geometry.height * .58 * videoFraming.previousAspectRatio)
+      / Math.min(geometry.width, geometry.height * .58 * videoFraming.aspectRatio)
+    : 1
   return <>
-    <video ref={videoRef} src={src} autoPlay muted loop playsInline preload="metadata" />
+    {/* Información editorial del encabezado y pie, separada de las tarjetas animadas. */}
+    <header className="archive-header">
+      <p className="archive-vault">Bóveda global<br />de semillas<br />de Svalbard<span className="editorial-dash" aria-hidden="true" /></p>
+      <p className="archive-collection"><span className="archive-index">{number} / {String(elements.length).padStart(2, '0')}</span>Premio Princesa de Asturias<br />de Cooperación Internacional<br />2026</p>
+      <p className="archive-coordinates"><span aria-hidden="true">+</span>{'78.23583° N\n15.49139° E'}</p>
+    </header>
+    <footer className="archive-footer">
+      <p className="archive-source">{info?.sources
+        ? `Fuentes: ${info.sources.join('\n')}`
+        : 'Fuente: Inventario Nacional de Recursos Fitogenéticos\npara la Agricultura y la Alimentación'}<span className="editorial-dash" aria-hidden="true" /></p>
+    </footer>
+    {/* Mapa sobre el bloque derecho del pie; el encuadre elimina los márgenes de la foto. */}
+    <figure className="archive-map">
+      <img src={mapImage} alt="Mapa de España formado por puntos, con Baleares y Canarias" />
+      {editorial?.mapPoint && <span
+        className="archive-map-point"
+        style={{ left: `${editorial.mapPoint.x}%`, top: `${editorial.mapPoint.y}%` }}
+        role="img" aria-label={`Lugar de recolección: ${editorial.mapPoint.label}`} title={editorial.mapPoint.label}
+      />}
+    </figure>
+    {/* Retícula editorial y guías: decorativas, no interfieren con el vídeo. */}
+    <svg className="technical-guides" viewBox="0 0 1024 1536" preserveAspectRatio="none" aria-hidden="true">
+      <ellipse cx="542.72" cy="714.24" rx="255" ry="250" strokeDasharray="4 7" />
+      <path d="M46 34V134 M230 34V134 M918 34V134 M52 685V945 M574 927V1079 M414 1430V1502 M770 1430V1502 M962 500V735 M52 513H88" />
+      <path d="M368 548H504 M638 1078V1400" strokeDasharray="2 5" />
+    </svg>
+    <video ref={videoRef} src={src} style={{ '--seed-framing-scale': framingScale }} autoPlay muted loop playsInline preload="auto" />
     <div className="piece-heading" ref={headingRef}>
-      <h1 className={`piece-title${scientificName ? ' piece-title-scientific' : ''}`} aria-label={displayTitle} style={{ fontSize: titleSize }}>
-        <span className="piece-title-measure" ref={titleMeasureRef} aria-hidden="true">{displayTitle}</span>
-        <span aria-hidden="true">{letters.slice(0, visibleLetters).join('')}</span>
+      <div className="title-measures" ref={titleMeasureRef} aria-hidden="true">
+        <span className="title-genus">{genus}</span><span className="title-species">{species}</span><span className="title-author">{author}</span>
+      </div>
+      <h1 className={`piece-title${scientificName ? ' piece-title-scientific' : ''}`} aria-label={displayTitle}>
+        <span className="title-genus" style={{ fontSize: titleSize.genus }} aria-hidden="true">{genus.slice(0, visibleLetters)}<span className="title-strut">&#8203;</span></span>
+        {species && <span className="title-second-line" aria-hidden="true">
+          <span className="title-species" style={{ fontSize: titleSize.species }}>{species.slice(0, Math.max(0, visibleLetters - genus.length - 1))}<span className="title-strut">&#8203;</span></span>
+          <span className="title-author" style={{ fontSize: titleSize.author }}>{author.slice(0, Math.max(0, visibleLetters - genus.length - species.length - 2))}</span>
+        </span>}
       </h1>
-      {scientificName && <p className="piece-common-name" style={{ opacity: clamp((playbackTime - titleDuration) / 0.5) }}>{title}</p>}
+      {/* El nombre común aparece en medio segundo al terminar el título científico. */}
+      {scientificName && <p className="piece-common-name" style={{ opacity: clamp((playbackTime - titleDuration) / 0.5) }}>{subtitleName || title}</p>}
     </div>
-    <div className="callout-overlay" ref={overlayRef} aria-hidden="true">
-      <svg className="callout-lines">
-        {annotations.map((callout) => <g key={callout.start} opacity={callout.lineOpacity}>
-          <path d={connectorPaths[callout.start]} pathLength="1" strokeDasharray="1" strokeDashoffset={1 - callout.draw} />
+
+    {/* Tarjetas y flechas comparten trayectoria y opacidad sincronizadas con el vídeo. */}
+    <div className="cards-overlay" ref={overlayRef}>
+      <svg className="seed-connectors" aria-hidden="true">
+        <defs>
+          <marker id={arrowId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
+            <path className="arrow-tip" d="M1 1 L9 5 L1 9" />
+          </marker>
+        </defs>
+        {connectors.map((line, index) => line && <g key={index} opacity={motions[index].opacity}>
+          <path className="seed-connector-line" d={line.path} markerEnd={`url(#${arrowId})`} />
+          <circle cx={line.x} cy={line.y} r="3" />
         </g>)}
       </svg>
-      {annotations.map((callout) => <div key={callout.start}>
-        <span className="callout-point" style={{ left: `${callout.point[0] / 10}%`, top: `${callout.point[1] / 10}%`, opacity: callout.lineOpacity }} />
-        <p ref={node => { copyRefs.current[callout.start] = node }} className={`callout-copy${info ? ' callout-copy-info' : ''}${callout.start === 2 ? ' callout-copy-simple' : ''}${callout.start === 17 ? ' callout-copy-boxed' : ''}`} style={{ left: callout.left, top: callout.top, bottom: callout.bottom, width: callout.width, opacity: callout.textOpacity }}>
-          <span className="callout-anchor" />
-          {callout.start === 17 && <span className="callout-card-heading"><strong>Muestra</strong></span>}
-          <span className="callout-text">{callout.text}</span>
-        </p>
-      </div>)}
+      {cards.map((card, index) => {
+        const elapsed = playbackTime - titleDuration - TITLE_PAUSE - index * CARD_INTERVAL
+        const position = cardPositions[index]
+        const motion = motions[index]
+        return <article ref={node => { cardRefs.current[index] = node }} key={card.title} className="seed-card" aria-hidden={elapsed <= 0} style={{
+          '--card-width': `${position.width}%`,
+          left: `${position.x}%`, top: `${position.y}%`, opacity: motion.opacity,
+          // Mover por transform evita recalcular la distribución en cada fotograma.
+          transform: `translate3d(calc(-50% + ${(motion.x - position.x) * geometry.width / 100}px), ${(motion.y - position.y) * geometry.height / 100}px, 0)`,
+          willChange: elapsed >= 0 && elapsed < CARD_DURATION ? 'transform, opacity' : 'auto',
+          visibility: elapsed <= 0 ? 'hidden' : 'visible', zIndex: elapsed < CARD_DURATION ? 2 : 1,
+        }}>
+          <div className="card-number" aria-hidden="true"><span>{String(index + 1).padStart(2, '0')}</span><span /></div>
+          <h2>{card.title}</h2>
+          {/* Solo información principal: sin notas ni pies dentro de las tarjetas. */}
+          {card.fields ? <dl className={`card-details${card.layout === 'table' ? ' card-details-table' : ''}`}>
+            {card.fields.map(([label,value]) => <div key={label}>
+              <dt>{label}</dt><dd>{value}</dd>
+            </div>)}
+          </dl> : <p>{card.text}</p>}
+        </article>
+      })}
     </div>
   </>
 }
-
-export default function App() {
+function PieceScreen({ pieceKey }) {
+  // SELECCIÓN POR URL: ?pieza=algarroba busca la ficha por nombre o identificador.
   const params = new URLSearchParams(window.location.search)
-  const key = params.get('pieza')
+  if (params.get('modo') === 'nfc') return <NfcPanel />
+  const key = pieceKey ?? params.get('pieza')
+  if (!key) return <IdleScreen />
   const piece = findPiece(key)
-  const whiteBackground = params.get('fondo') !== 'negro' && Boolean(piece?.whiteVideoFile)
+  // Fondo blanco por defecto; &fondo=negro selecciona el vídeo original sobre negro.
+  // Si aún no existe la copia clara, reproduce el original en lugar de quedar vacío.
+  const whiteBackground = params.get('fondo') !== 'negro' && Boolean(videos[`./assets/${piece?.whiteVideoFile}`])
   const videoFile = whiteBackground ? piece.whiteVideoFile : piece?.videoFile
   const video = videoFile && videos[`./assets/${videoFile}`]
 
   return (
     <main className={`video-screen${whiteBackground ? ' video-screen-white' : ''}`}>
-      <div className="video-stage">
-        {video && <VideoWithCallouts key={video} src={video} title={piece.title} scientificName={piece.scientificName} info={piece.info} />}
+      <div className="video-stage" style={{ '--seed-scale': piece?.videoScale ?? 1, '--seed-top': piece?.videoTop ?? '46.5%', '--title-line-gap': piece?.titleLineGap ?? '.2cqw' }}>
+        {/* Sin vídeo no se muestra contenido. key reinicia la secuencia si cambia el vídeo. */}
+        {video && <VideoWithCallouts key={video} src={video} title={piece.title} subtitleName={piece.subtitleName} scientificName={piece.scientificName} info={piece.info} number={piece.number} editorial={piece.editorial} videoFraming={piece.videoFraming} seedAnchors={piece.seedAnchors} cardOverrides={piece.cardOverrides} />}
       </div>
     </main>
   )
+}
+
+export default function App() {
+  if (window.seedDesktop) return <DesktopRuntime renderPiece={(slug, token) => <PieceScreen key={token} pieceKey={slug} />} />
+  return <PieceScreen />
 }

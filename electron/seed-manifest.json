@@ -1,0 +1,92 @@
+[
+  {
+    "slug": "algarroba",
+    "title": "Algarroba o lenteja moruna",
+    "subtitleName": "Lenteja moruna"
+  },
+  {
+    "slug": "berenjena",
+    "title": "Berenjena",
+    "subtitleName": "Alberginia"
+  },
+  {
+    "slug": "cardo_blanco",
+    "title": "Cardo blanco",
+    "subtitleName": "Cardo blanco sin pinchos"
+  },
+  {
+    "slug": "cebada",
+    "title": "Cebada",
+    "subtitleName": "Cebada tremesina"
+  },
+  {
+    "slug": "cebolla",
+    "title": "Cebolla",
+    "subtitleName": "Cebolla babosa"
+  },
+  {
+    "slug": "escanda",
+    "title": "Escanda",
+    "subtitleName": "Escanda"
+  },
+  {
+    "slug": "faba",
+    "title": "Faba",
+    "subtitleName": "Faba güeyin"
+  },
+  {
+    "slug": "guisante",
+    "title": "Guisante",
+    "subtitleName": "Bisalto del terreno"
+  },
+  {
+    "slug": "maiz",
+    "title": "Maíz",
+    "subtitleName": "Maíz"
+  },
+  {
+    "slug": "mijo",
+    "title": "Mijo",
+    "subtitleName": "Escoba de año"
+  },
+  {
+    "slug": "nabo",
+    "title": "Nabo",
+    "subtitleName": "Nabo de cabeza roja"
+  },
+  {
+    "slug": "tomate",
+    "title": "Tomate",
+    "subtitleName": "Tomate moruno"
+  },
+  {
+    "slug": "azafranero",
+    "title": "Azafranero",
+    "subtitleName": "Azafranero"
+  },
+  {
+    "slug": "sarraceno",
+    "title": "Sarraceno",
+    "subtitleName": "Trigo sarraceno"
+  },
+  {
+    "slug": "zanahoria_redonda",
+    "title": "Zanahoria redonda",
+    "subtitleName": "Morada del Maestrazgo"
+  },
+  {
+    "slug": "faba_vino",
+    "title": "Faba de vino",
+    "subtitleName": "Fabe de vino"
+  },
+  {
+    "slug": "altramuz",
+    "title": "Altramuz azul",
+    "subtitleName": "Altramuz"
+  },
+  {
+    "slug": "panis",
+    "title": "Panís d’ensalat",
+    "subtitleName": "Panis d'ensalat"
+  }
+]

@@ -5,3 +5,7 @@ dist/
 !.env.example
 *.log
 .tools/
+release/
+__pycache__/
+*.py[cod]
+config/tarjetas-semillas.json
