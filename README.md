@@ -78,23 +78,23 @@ Cada vídeo se abre mediante el parámetro `pieza` de la URL. Estos enlaces se p
 
 | Pieza | Enlace relativo | Archivo |
 | --- | --- | --- |
-| Algarroba | `?pieza=algarroba` | `ALGARROBA.mp4` |
-| Berenjena | `?pieza=berenjena` | `BERENJENA.mp4` |
-| Cardo blanco | `?pieza=cardo_blanco` | `CARDO-bucle.mp4` |
-| Cebada | `?pieza=cebada` | `cebada-2-blanco.mp4` (copia H.264 de `cebada (2).mp4` con fondo uniforme) |
-| Cebolla | `?pieza=cebolla` | `cebolla.mp4` |
-| Escanda | `?pieza=escanda` | `ESCANDA.mp4` |
+| Algarroba | `?pieza=algarroba` | `algarroba-constante.mp4` |
+| Berenjena | `?pieza=berenjena` | `berenjena-fluido.mp4` |
+| Cardo blanco | `?pieza=cardo_blanco` | `cardo-bueno-blanco.mp4` (copia H.264 de `CARDO BUENO.mp4` con fondo uniforme) |
+| Cebada | `?pieza=cebada` | `cebada-2-blanco.mp4` |
+| Cebolla | `?pieza=cebolla` | `cebolla-fluido.mp4` |
+| Escanda | `?pieza=escanda` | `escanda-bueno-blanco.mp4` |
 | Faba | `?pieza=faba` | `gueyín (1).mp4` |
-| Guisante | `?pieza=guisante` | `GUISANTE.mp4` |
-| Maíz | `?pieza=maiz` | `MAIZ.mp4` |
-| Mijo | `?pieza=mijo` | `MIJO.mp4` |
-| Nabo | `?pieza=nabo` | `NABO.mp4` |
-| Tomate | `?pieza=tomate` | `TOMATE.mp4` |
-| Azafranero | `?pieza=azafranero` | `azafranero_semilla_360_negro_uniforme.mp4` |
-| Sarraceno | `?pieza=sarraceno` | `SARRACENO.mp4` |
-| Zanahoria redonda | `?pieza=zanahoria_redonda` | `daucus-carota-blanco.mp4` (copia H.264 de `Daucus carota L..mp4` con fondo uniforme) |
-| Faba de vino | `?pieza=faba_vino` | `FABA VINO.mp4` |
-| Altramuz azul | `?pieza=altramuz` (también `?pieza=semilla_provisional`) | `One-uncut-photoreal-macro-turntable-of-O.mp4` |
+| Guisante | `?pieza=guisante` | `guisante-constante.mp4` |
+| Maíz | `?pieza=maiz` | `maiz-fluido.mp4` |
+| Mijo | `?pieza=mijo` | `mijo-bueno-blanco.mp4` (copia H.264 de `MIJO BUENO.mp4` con fondo uniforme) |
+| Nabo | `?pieza=nabo` | `nabo-fluido.mp4` |
+| Tomate | `?pieza=tomate` | `tomate-constante.mp4` |
+| Azafranero | `?pieza=azafranero` | `azafranero-fluido.mp4` |
+| Sarraceno | `?pieza=sarraceno` | `sarraceno-constante.mp4` |
+| Zanahoria redonda | `?pieza=zanahoria_redonda` | `zanahoria-bueno-blanco.mp4` (copia H.264 de `ZANAHORIA BUENO.mp4` con fondo uniforme) |
+| Faba de vino | `?pieza=faba_vino` | `faba_vino-fluido.mp4` |
+| Altramuz azul | `?pieza=altramuz` (también `?pieza=semilla_provisional`) | `altramuz-fluido.mp4` |
 | Panís d’ensalat | `?pieza=panis` (alias `?pieza=maiz2`) | `maiz2 (1).mp4` |
 
 Los vídeos se reproducen automáticamente, en bucle y silenciados para permitir la reproducción automática en móviles. Mantienen su proporción sin recortes.
@@ -123,10 +123,10 @@ Los vídeos con nombres en mayúsculas se usan directamente porque ya tienen
 fondo blanco. La mezcla `multiply` los integra con el gris
 `#E0E0E0` de la ficha, igual que los demás vídeos de fondo claro.
 
-Cardo blanco usa `CARDO-bucle.mp4`: los primeros 240 fotogramas (10 segundos)
-de `CARDO.mp4`, sin los 20 segundos finales vacíos. Se conserva el original.
+Cardo blanco usa una copia de `CARDO BUENO.mp4` con fondo uniforme,
+sin la sombra exterior y con el tamaño ajustado a la composición.
 
-Los enlaces habituales muestran las doce semillas sobre blanco, con textos y
+Los enlaces habituales muestran las 18 semillas sobre gris, con textos y
 líneas negros. Para comparar con el original, añade `&fondo=negro` a cualquier
 enlace, por ejemplo `?pieza=algarroba&fondo=negro`.
 
@@ -141,12 +141,11 @@ Las hojas de revisión se guardan en `.tools/white-review`.
 
 ## Giro fluido
 
-Las 17 fichas usan las copias `src/assets/*-fluido.mp4` y `*-constante.mp4`, asociadas en
-`src/smooth-videos.js`. Se exportan a 60 fps mediante interpolación de
-movimiento y mantienen la resolución, el encuadre y las escalas de cada
-semilla. El fondo blanco sigue mezclándose con el gris `#E0E0E0`.
-Se eliminan las pausas de fotogramas repetidos y se ajustan los cierres que
-no coincidían con el inicio. Los originales se conservan para comparación.
+Las asociaciones vigentes están en `src/data.js` y `src/smooth-videos.js`.
+Las copias `*-fluido.mp4` y `*-constante.mp4` se reproducen a 60 fps.
+Los nuevos vídeos de cardo, escanda, mijo y zanahoria usan copias H.264
+con el fondo limpio, conservando los fotogramas de sus fuentes.
+El fondo blanco se mezcla con el gris `#E0E0E0`.
 La web precarga el vídeo y deja de actualizar las cartelas cuando termina
 su animación, para reducir el trabajo durante las vueltas posteriores.
 
@@ -156,16 +155,16 @@ Las fuentes quedan registradas en `scripts/loop-sources.json`; el script usa
 OpenCV, NumPy e imageio-ffmpeg de `.tools/video`, como el cambio de fondo.
 Los informes de exportación se guardan en `.tools/smooth-loops`.
 
-Algarroba, cardo, cebada, escanda, guisante, tomate y sarraceno usan
-`*-constante.mp4`: aceleran los tramos que se frenan y compensan el resto
-para conservar la duración de cada vuelta. La medición usa el movimiento
-visible con flujo óptico, suavizado para evitar cambios bruscos de velocidad.
-Las poses intermedias se interpolan a 60 fps. Las diez semillas que ya
-giraban de forma regular mantienen sus copias anteriores.
-Para regenerar el ajuste después de crear los bucles fluidos:
-`python scripts/even-rotation.py`.
-Este proceso conserva las copias anteriores y guarda las mediciones antes
-y después en `.tools/rotation-reports`.
+Solo se conservan los 34 vídeos referenciados por el interactivo, incluidas
+las variantes accesibles con `&fondo=negro`. Se eliminaron 47 versiones sin uso.
+El empaquetado limpia la copia de trabajo antes de copiar la compilación,
+para que los vídeos eliminados tampoco permanezcan en el ejecutable.
+
+Los puntos de las flechas quedan fuera del contorno de cada semilla con un
+margen visible. `src/seed-video-bounds.json` recoge el contorno exterior de
+todos los fotogramas. Tras sustituir un vídeo, actualiza su medida con
+`python scripts/seed-video-bounds.py nombre-del-video.mp4` o mide todas
+las fichas omitiendo el nombre del archivo.
 
 ## Compilación
 

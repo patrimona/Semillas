@@ -3,6 +3,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 const staging = path.resolve('.tools/desktop-stage')
 fs.mkdirSync(staging, { recursive: true })
+// Remove previous staged copies so obsolete videos cannot remain in the app.
+for (const name of ['dist', 'electron']) {
+  const target = path.resolve(staging, name)
+  if (!target.startsWith(staging + path.sep)) throw new Error('Invalid staging path')
+  fs.rmSync(target, { recursive: true, force: true })
+}
 fs.cpSync('dist', path.join(staging,'dist'), { recursive: true })
 fs.cpSync('electron', path.join(staging,'electron'), { recursive: true })
 fs.writeFileSync(path.join(staging,'package.json'), JSON.stringify({name:'semillas-nfc',version:'1.0.0',main:'electron/main.cjs'}))

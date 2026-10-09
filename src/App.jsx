@@ -4,6 +4,8 @@ import mapImage from './assets/mapa.jpg'
 import NfcPanel from './NfcPanel.jsx'
 import DesktopRuntime from './DesktopRuntime.jsx'
 import IdleScreen from './IdleScreen.jsx'
+import seedVideoBounds from './seed-video-bounds.json'
+import { exteriorSeedPoint } from './seed-connectors.js'
 
 // Catálogo de vídeos: Vite convierte cada MP4 de assets en una URL utilizable.
 // Los nombres, archivos y datos de cada semilla se definen en src/data.js.
@@ -36,9 +38,12 @@ const smootherstep = value => value ** 3 * (value * (value * 6 - 15) + 10)
 function cardMotion(position, index, elapsed, reducedMotion, geometry, sourcePoint = SEED_POINTS[index]) {
   const size = geometry.cards[index]
   const opacity = smoothstep(clamp(elapsed / .4))
-  if (!size || !geometry.width || !geometry.height) return { x: position.x, y: position.y, opacity: 0 }
-  const sourceX = sourcePoint[0] / 100 * geometry.width
-  const sourceY = sourcePoint[1] / 100 * geometry.height
+  if (!size || !geometry.width || !geometry.height || !geometry.seedBox) return { x: position.x, y: position.y, opacity: 0 }
+  // The margin includes the dot radius, leaving visible space around the seed.
+  const { x: sourceX, y: sourceY } = exteriorSeedPoint({
+    x: sourcePoint[0] / 100 * geometry.width,
+    y: sourcePoint[1] / 100 * geometry.height,
+  }, geometry.seedBox, geometry.width * .012 + (geometry.seedBox.edgePadding || 0))
   const centerX = position.x / 100 * geometry.width
   // Los textos largos suben solo lo necesario para dejar libre el pie.
   const top = Math.min(position.y / 100 * geometry.height, geometry.height * .935 - size.height - geometry.height * .012)
@@ -77,7 +82,7 @@ function CardText({ text }) {
   )
 }
 
-function VideoWithCallouts({ src, title, subtitleName, scientificName, info, editorial, videoFraming, seedAnchors, cardOverrides }) {
+function VideoWithCallouts({ src, title, subtitleName, scientificName, info, editorial, videoFraming, seedAnchors, cardOverrides, seedBounds }) {
   const cardPositions = defaultCardPositions.map((position, index) => ({ ...position, ...cardOverrides?.[index] }))
   // Referencias a elementos HTML para consultar el vídeo y medir textos y posiciones.
   const videoRef = useRef(null)
@@ -86,6 +91,12 @@ function VideoWithCallouts({ src, title, subtitleName, scientificName, info, edi
   const overlayRef = useRef(null)
   const cardRefs = useRef([])
   const [geometry, setGeometry] = useState({ width: 0, height: 0, cards: [] })
+  // Compensa el cambio de encuadre manteniendo el tamaño visible anterior.
+  const framingScale = videoFraming && geometry.width && geometry.height
+    ? videoFraming.contentScale
+      * Math.min(geometry.width, geometry.height * .58 * videoFraming.previousAspectRatio)
+      / Math.min(geometry.width, geometry.height * .58 * videoFraming.aspectRatio)
+    : 1
   const [reducedMotion, setReducedMotion] = useState(false)
   const arrowId = useId()
   // Estado del tamaño del título y del reloj compartido por todas las tarjetas.
@@ -136,17 +147,41 @@ function VideoWithCallouts({ src, title, subtitleName, scientificName, info, edi
   // que cada tarjeta en cada fotograma, también al redimensionar la pantalla.
   useLayoutEffect(() => {
     const align = () => {
-      const { width, height, left } = overlayRef.current.getBoundingClientRect()
+      const { width, height, left, top } = overlayRef.current.getBoundingClientRect()
       const titleRight = headingRef.current.getBoundingClientRect().right - left
-      setGeometry({ width, height, titleRight, cards: cardRefs.current.map(card => ({ width: card.offsetWidth, height: card.offsetHeight })) })
+      const video = videoRef.current
+      let seedBox = null
+      if (video.videoWidth && video.videoHeight) {
+        const rect = video.getBoundingClientRect()
+        const fit = Math.min(rect.width / video.videoWidth, rect.height / video.videoHeight)
+        const imageWidth = video.videoWidth * fit
+        const imageHeight = video.videoHeight * fit
+        const imageLeft = rect.left - left + (rect.width - imageWidth) / 2
+        const imageTop = rect.top - top + (rect.height - imageHeight) / 2
+        const bounds = seedBounds || { left: 0, top: 0, right: 1, bottom: 1 }
+        seedBox = {
+          left: imageLeft + bounds.left * imageWidth,
+          top: imageTop + bounds.top * imageHeight,
+          right: imageLeft + bounds.right * imageWidth,
+          bottom: imageTop + bounds.bottom * imageHeight,
+          outline: bounds.outline?.map(([x,y]) => ({x:imageLeft+x*imageWidth,y:imageTop+y*imageHeight})),
+          edgePadding: (bounds.edgePadding || 0) * Math.max(imageWidth,imageHeight),
+        }
+      }
+      setGeometry({ width, height, titleRight, seedBox, cards: cardRefs.current.map(card => ({ width: card.offsetWidth, height: card.offsetHeight })) })
     }
     const observer = new ResizeObserver(align)
     observer.observe(overlayRef.current)
     observer.observe(headingRef.current)
     cardRefs.current.forEach(card => observer.observe(card))
+    videoRef.current.addEventListener('loadedmetadata', align)
     align()
-    return () => observer.disconnect()
-  }, [info])
+    const video = videoRef.current
+    return () => {
+      observer.disconnect()
+      video.removeEventListener('loadedmetadata', align)
+    }
+  }, [info, seedBounds, framingScale])
   // Acumula el tiempo reproducido: las tarjetas esperan si el vídeo se pausa.
   useEffect(() => {
     let frame
@@ -187,12 +222,6 @@ function VideoWithCallouts({ src, title, subtitleName, scientificName, info, edi
   ]
   const motions = cardPositions.map((position, index) => cardMotion(position, index, playbackTime - titleDuration - TITLE_PAUSE - index * CARD_INTERVAL, reducedMotion, geometry, seedAnchors?.[index]))
   const connectors = motions.map(motion => motion.line)
-  // Compensa el cambio de encuadre manteniendo el tamaño visible anterior.
-  const framingScale = videoFraming && geometry.width && geometry.height
-    ? videoFraming.contentScale
-      * Math.min(geometry.width, geometry.height * .58 * videoFraming.previousAspectRatio)
-      / Math.min(geometry.width, geometry.height * .58 * videoFraming.aspectRatio)
-    : 1
   return <>
     {/* Información editorial del encabezado y pie, separada de las tarjetas animadas. */}
     <header className="archive-header">
@@ -291,7 +320,7 @@ function PieceScreen({ pieceKey }) {
     <main className={`video-screen${whiteBackground ? ' video-screen-white' : ''}`}>
       <div className="video-stage" style={{ '--seed-scale': piece?.videoScale ?? 1, '--seed-top': piece?.videoTop ?? '46.5%', '--title-line-gap': piece?.titleLineGap ?? '.2cqw' }}>
         {/* Sin vídeo no se muestra contenido. key reinicia la secuencia si cambia el vídeo. */}
-        {video && <VideoWithCallouts key={video} src={video} title={piece.title} subtitleName={piece.subtitleName} scientificName={piece.scientificName} info={piece.info} number={piece.number} editorial={piece.editorial} videoFraming={piece.videoFraming} seedAnchors={piece.seedAnchors} cardOverrides={piece.cardOverrides} />}
+        {video && <VideoWithCallouts key={video} src={video} title={piece.title} subtitleName={piece.subtitleName} scientificName={piece.scientificName} info={piece.info} editorial={piece.editorial} videoFraming={piece.videoFraming} seedAnchors={piece.seedAnchors} cardOverrides={piece.cardOverrides} seedBounds={seedVideoBounds[videoFile]} />}
       </div>
     </main>
   )

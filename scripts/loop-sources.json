@@ -1,15 +1,15 @@
 [
   {
     "slug": "algarroba",
-    "file": "ALGARROBA.mp4"
+    "file": "algarroba-constante.mp4"
   },
   {
     "slug": "berenjena",
-    "file": "BERENJENA.mp4"
+    "file": "berenjena-fluido.mp4"
   },
   {
     "slug": "cardo_blanco",
-    "file": "CARDO-bucle.mp4"
+    "file": "cardo-bueno-blanco.mp4"
   },
   {
     "slug": "cebada",
@@ -17,11 +17,11 @@
   },
   {
     "slug": "cebolla",
-    "file": "cebolla-blanco.mp4"
+    "file": "cebolla-fluido.mp4"
   },
   {
     "slug": "escanda",
-    "file": "ESCANDA.mp4"
+    "file": "escanda-bueno-blanco.mp4"
   },
   {
     "slug": "faba",
@@ -29,43 +29,43 @@
   },
   {
     "slug": "guisante",
-    "file": "GUISANTE.mp4"
+    "file": "guisante-constante.mp4"
   },
   {
     "slug": "maiz",
-    "file": "MAIZ.mp4"
+    "file": "maiz-fluido.mp4"
   },
   {
     "slug": "mijo",
-    "file": "MIJO.mp4"
+    "file": "mijo-bueno-blanco.mp4"
   },
   {
     "slug": "nabo",
-    "file": "NABO.mp4"
+    "file": "nabo-fluido.mp4"
   },
   {
     "slug": "tomate",
-    "file": "TOMATE.mp4"
+    "file": "tomate-constante.mp4"
   },
   {
     "slug": "azafranero",
-    "file": "azafranero_semilla_360_negro_uniforme-blanco.mp4"
+    "file": "azafranero-fluido.mp4"
   },
   {
     "slug": "sarraceno",
-    "file": "SARRACENO.mp4"
+    "file": "sarraceno-constante.mp4"
   },
   {
     "slug": "zanahoria_redonda",
-    "file": "daucus-carota-blanco.mp4"
+    "file": "zanahoria-bueno-blanco.mp4"
   },
   {
     "slug": "faba_vino",
-    "file": "FABA VINO.mp4"
+    "file": "faba_vino-fluido.mp4"
   },
   {
     "slug": "altramuz",
-    "file": "One-uncut-photoreal-macro-turntable-of-O-blanco.mp4"
+    "file": "altramuz-fluido.mp4"
   },
   {
     "slug": "panis",
