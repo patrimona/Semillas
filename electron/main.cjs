@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const { spawn } = require('node:child_process')
 const fs = require('node:fs')
 const path = require('node:path')
@@ -12,31 +12,23 @@ if (process.env.SEEDS_DATA_DIR) app.setPath('userData', process.env.SEEDS_DATA_D
 if (!app.requestSingleInstanceLock()) app.quit()
 else {
   app.whenReady().then(() => {
-    store = createTagStore(path.join(app.getPath('userData'), 'tarjetas-semillas.json'), manifest.map(p => p.slug))
-    window = new BrowserWindow({ width: 1100, height: 850, show: !process.argv.includes('--smoke-test'), backgroundColor: '#E0E0E0',
+    const bundledTags = path.join(__dirname, 'tarjetas-semillas.json')
+    store = createTagStore(fs.existsSync(bundledTags) ? bundledTags : path.join(app.getPath('userData'), 'tarjetas-semillas.json'), manifest.map(p => p.slug))
+    store.read()
+    window = new BrowserWindow({ width: 1100, height: 850, fullscreen: !process.argv.includes('--smoke-test'), show: !process.argv.includes('--smoke-test'), backgroundColor: '#E0E0E0',
       webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true } })
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
     window.webContents.on('will-navigate', (event, url) => { if (!url.startsWith('file://')) event.preventDefault() })
     window.webContents.session.setPermissionRequestHandler((_webContents, _permission, callback) => callback(false))
     window.webContents.session.webRequest.onBeforeRequest({ urls: ['http://*/*', 'https://*/*'] }, (_details, callback) => callback({ cancel: true }))
-    Menu.setApplicationMenu(Menu.buildFromTemplate([{ label: 'Semillas', submenu: [
-      { label: 'Ver semillas', click: () => window.webContents.send('seeds:mode', 'view') },
-      { label: 'Asignar tarjetas', click: () => window.webContents.send('seeds:mode', 'nfc') },
-      { type: 'separator' }, { role: 'togglefullscreen', label: 'Pantalla completa', accelerator:'F11' }, { role: 'quit', label: 'Salir' },
-    ] }]))
+    Menu.setApplicationMenu(null)
+    window.webContents.on('before-input-event', (event, input) => {
+      if (input.type === 'keyDown' && input.key === 'F11') {
+        event.preventDefault(); window.setFullScreen(!window.isFullScreen())
+      }
+    })
     const trusted = event => { if (event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame) throw new Error('Origen no permitido.') }
-    ipcMain.handle('seeds:state', event => { trusted(event); return { ...store.read(), status, storagePath: app.getPath('userData') } })
-    ipcMain.handle('seeds:save', (event, uid, slug, expectedSlug) => { trusted(event); return store.save(uid, slug, expectedSlug) })
-    ipcMain.handle('seeds:export', async event => {
-      trusted(event)
-      const data = store.read()
-      const { canceled, filePath } = await dialog.showSaveDialog(window, { defaultPath: 'tarjetas-semillas.json', filters: [{ name: 'Asociaciones de semillas', extensions: ['json'] }] })
-      if (canceled) return false
-      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8'); return true
-    })
-    if (process.argv.includes('--assign')) window.webContents.once('did-finish-load', () => {
-      setTimeout(() => window.webContents.send('seeds:mode', 'nfc'), 350)
-    })
+    ipcMain.handle('seeds:state', event => { trusted(event); return { ...store.read(), status } })
     window.loadFile(path.join(__dirname, '../dist/index.html'))
     startReader()
     if (process.argv.includes('--smoke-test')) smokeTest()
@@ -67,15 +59,15 @@ async function smokeTest() {
     if (!process.env.SEEDS_DATA_DIR) throw new Error('Smoke test requires an isolated data directory.')
     const result = await window.webContents.executeJavaScript(`(async () => {
       const state = await window.seedDesktop.getState();
-      return {bridge: !!window.seedDesktop, local: location.protocol === 'file:', text: document.body.innerText, state};
+      return {bridge: !!window.seedDesktop, local: location.protocol === 'file:', heading:document.querySelector('h1')?.textContent,
+        readOnly:!window.seedDesktop.save && !window.seedDesktop.exportBackup && !window.seedDesktop.onMode, count:Object.keys(state.tags).length};
     })()`)
-    if (!result.bridge || !result.local) throw new Error('Offline application did not load')
+    if (!result.bridge || !result.local || !result.readOnly || result.heading !== 'Escanea el sobre para descubrir una semilla' || Menu.getApplicationMenu()) throw new Error('Final exhibition app did not load in read-only waiting mode')
     const videos = []
     for (let index=0;index<manifest.length;index++) {
       const seed = manifest[index]
-      const uid = (0x04000000 + index).toString(16).padStart(8,'0').toUpperCase()
-      const existing = store.read().tags[uid] || null
-      if (existing !== seed.slug) await window.webContents.executeJavaScript(`window.seedDesktop.save(${JSON.stringify(uid)},${JSON.stringify(seed.slug)},${JSON.stringify(existing)})`)
+      const uid = Object.keys(store.read().tags).find(uid => store.read().tags[uid] === seed.slug)
+      if (!uid) throw new Error('No assigned sticker for ' + seed.slug)
       window.webContents.send('seeds:tag',{uid,reader:'Smoke test'})
       await new Promise(resolve => setTimeout(resolve, 550))
       const video = await window.webContents.executeJavaScript(`(async()=>{
@@ -87,22 +79,16 @@ async function smokeTest() {
       videos.push({slug:seed.slug,...video})
     }
     result.videos=videos
-    window.webContents.send('seeds:mode','nfc')
-    window.webContents.send('seeds:tag',{uid:'04AABBCC',reader:'Smoke test'})
-    await new Promise(resolve => setTimeout(resolve,250))
-    await window.webContents.executeJavaScript(`(()=>{
-      const select=document.querySelector('select'); select.value='panis'; select.dispatchEvent(new Event('change',{bubbles:true}));
-    })()`)
-    await new Promise(resolve => setTimeout(resolve,150))
-    await window.webContents.executeJavaScript(`(()=>{
-      const button=[...document.querySelectorAll('button')].find(b=>b.textContent==='Guardar asociación');
-      if(!button || button.disabled) throw new Error('Assignment button unavailable'); button.click();
-    })()`)
+    let unknown = 'FFFFFFFFFFFFFFFF'
+    while (store.read().tags[unknown]) unknown += 'FF'
+    window.webContents.send('seeds:tag',{uid:unknown,reader:'Smoke test'})
     await new Promise(resolve => setTimeout(resolve,300))
-    result.assignment=store.read().tags['04AABBCC']==='panis'
-    result.assignmentText=await window.webContents.executeJavaScript('document.body.innerText')
+    result.unknownReturnsToIdle=await window.webContents.executeJavaScript(`(()=>{
+      document.dispatchEvent(new KeyboardEvent('keydown',{key:'a',ctrlKey:true,shiftKey:true,bubbles:true}));
+      return document.querySelector('h1')?.textContent==='Escanea el sobre para descubrir una semilla' && !document.querySelector('select,button');
+    })()`)
     fs.writeFileSync(path.join(app.getPath('userData'), 'smoke-result.json'), JSON.stringify(result, null, 2))
     readerProcess?.kill()
-    app.exit(result.assignment && videos.every(v=>v.playing && !v.error) ? 0 : 1)
+    app.exit(result.unknownReturnsToIdle && videos.every(v=>v.playing && !v.error) ? 0 : 1)
   } catch (error) { console.error(error); readerProcess?.kill(); app.exit(1) }
 }

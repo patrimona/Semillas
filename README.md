@@ -15,32 +15,27 @@ el controlador CCID/PC/SC de ACS desde
 y la orden GET UID `FF CA 00 00 00`, documentada por ACS. No modifica las tarjetas.
 Las pegatinas deben proporcionar un identificador estable.
 
-En «Asignar tarjetas», acerca una tarjeta, selecciona la semilla y pulsa
-«Guardar asociación». En «Ver semillas», acercar una tarjeta asignada abre
-automáticamente su ficha. Retira y vuelve a acercar la tarjeta para reiniciar
-la misma ficha. Una tarjeta desconocida muestra un aviso y no conserva en
-pantalla la ficha de la tarjeta anterior.
+La app final abre directamente en pantalla completa con el mensaje
+«Escanea el sobre para descubrir una semilla». Acercar una pegatina asignada
+abre su ficha. Retira y vuelve a acercarla para reiniciar la misma ficha.
+Una pegatina desconocida devuelve la pantalla de espera.
+No hay menús, paneles de asignación, exportación ni funciones para escribir NFC.
+F11 activa o desactiva la pantalla completa; Alt + F4 cierra la aplicación.
 
-Las asociaciones se guardan como `tarjetas-semillas.json` en la carpeta de datos
-de la aplicación, mostrada en el panel. Cada cambio conserva la versión anterior
-como `.bak`; el panel permite exportar una copia. Para restaurar o trasladar las
-asociaciones, cierra la aplicación y copia el JSON exportado a esa carpeta con
-el nombre `tarjetas-semillas.json`. Un archivo dañado genera un error y no se
-sobrescribe automáticamente.
-
-La copia local `config/tarjetas-semillas.json` está excluida del repositorio.
-Para instalar las asociaciones exportadas en otro ordenador, copia el archivo
-JSON a la carpeta de datos mostrada en el panel, con la aplicación cerrada.
-
-Ctrl + Mayús + A cambia de modo. F11 activa o desactiva la pantalla completa.
-El menú «Semillas» también permite cambiar de modo.
+El ejecutable incluye las asociaciones de `config/tarjetas-semillas.json`.
+Este archivo privado sigue excluido de Git y se copia únicamente al paquete
+local de la aplicación. Al copiar toda la carpeta a otro ordenador, las
+pegatinas ya funcionan sin configuración adicional. Para generar la app final
+es obligatorio disponer de asociaciones válidas para las 18 semillas.
+La aplicación solo lee ese archivo y nunca modifica las asociaciones.
 
 Para generar el ejecutable: `npm run desktop:package`.
 Pruebas de almacenamiento: `npm run test:desktop`.
 Las pruebas del ejecutable usan una carpeta de datos aislada y tarjetas simuladas;
 la lectura física debe verificarse con el ACR1552U y las pegatinas de la instalación.
 
-Instalación de 15 piezas, doce de ellas con vídeos centrados sobre fondo blanco y sin controles visibles. Cinco líneas negras dan paso a cuatro bloques compactos de información y un espacio cuadrado vacío para una futura foto, arriba a la derecha. La algarroba tiene su ficha completa; las demás conservan textos provisionales.
+Instalación de 18 semillas con vídeos sobre fondo gris, cinco cartelas de datos
+y un mapa del lugar de recolección. La lectura de las pegatinas es local y sin conexión.
 
 ## Desarrollo
 
