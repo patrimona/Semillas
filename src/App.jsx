@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { elements, findPiece } from './data'
+import { findPiece } from './data'
 import mapImage from './assets/mapa.jpg'
 import NfcPanel from './NfcPanel.jsx'
 import DesktopRuntime from './DesktopRuntime.jsx'
@@ -69,7 +69,15 @@ function cardMotion(position, index, elapsed, reducedMotion, geometry, sourcePoi
     },
   }
 }
-function VideoWithCallouts({ src, title, subtitleName, scientificName, info, number, editorial, videoFraming, seedAnchors, cardOverrides }) {
+function CardText({ text }) {
+  return text.split(/(\*[^*]+\*)/g).map((part, index) =>
+    part.startsWith('*') && part.endsWith('*')
+      ? <em key={index}>{part.slice(1, -1)}</em>
+      : part,
+  )
+}
+
+function VideoWithCallouts({ src, title, subtitleName, scientificName, info, editorial, videoFraming, seedAnchors, cardOverrides }) {
   const cardPositions = defaultCardPositions.map((position, index) => ({ ...position, ...cardOverrides?.[index] }))
   // Referencias a elementos HTML para consultar el vídeo y medir textos y posiciones.
   const videoRef = useRef(null)
@@ -189,7 +197,7 @@ function VideoWithCallouts({ src, title, subtitleName, scientificName, info, num
     {/* Información editorial del encabezado y pie, separada de las tarjetas animadas. */}
     <header className="archive-header">
       <p className="archive-vault">Bóveda global<br />de semillas<br />de Svalbard<span className="editorial-dash" aria-hidden="true" /></p>
-      <p className="archive-collection"><span className="archive-index">{number} / {String(elements.length).padStart(2, '0')}</span>Premio Princesa de Asturias<br />de Cooperación Internacional<br />2026</p>
+      <p className="archive-collection">Premio Princesa de Asturias<br />de Cooperación Internacional<br />2026</p>
       <p className="archive-coordinates"><span aria-hidden="true">+</span>{'78.23583° N\n15.49139° E'}</p>
     </header>
     <footer className="archive-footer">
@@ -258,9 +266,9 @@ function VideoWithCallouts({ src, title, subtitleName, scientificName, info, num
           {/* Solo información principal: sin notas ni pies dentro de las tarjetas. */}
           {card.fields ? <dl className={`card-details${card.layout === 'table' ? ' card-details-table' : ''}`}>
             {card.fields.map(([label,value]) => <div key={label}>
-              <dt>{label}</dt><dd>{value}</dd>
+              <dt>{label}:</dt><dd>{index === 1 && label === (info.commonNamesLabel || 'Nombres comunes') ? <strong>{value}</strong> : value}</dd>
             </div>)}
-          </dl> : <p>{card.text}</p>}
+          </dl> : <p><CardText text={card.text} /></p>}
         </article>
       })}
     </div>

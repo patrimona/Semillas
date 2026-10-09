@@ -92,7 +92,7 @@ Cada vídeo se abre mediante el parámetro `pieza` de la URL. Estos enlaces se p
 | Tomate | `?pieza=tomate` | `TOMATE.mp4` |
 | Azafranero | `?pieza=azafranero` | `azafranero_semilla_360_negro_uniforme.mp4` |
 | Sarraceno | `?pieza=sarraceno` | `SARRACENO.mp4` |
-| Zanahoria redonda | `?pieza=zanahoria_redonda` | `zanahoria_redonda_360 (1).mp4` |
+| Zanahoria redonda | `?pieza=zanahoria_redonda` | `daucus-carota-blanco.mp4` (copia H.264 de `Daucus carota L..mp4` con fondo uniforme) |
 | Faba de vino | `?pieza=faba_vino` | `FABA VINO.mp4` |
 | Altramuz azul | `?pieza=altramuz` (también `?pieza=semilla_provisional`) | `One-uncut-photoreal-macro-turntable-of-O.mp4` |
 | Panís d’ensalat | `?pieza=panis` (alias `?pieza=maiz2`) | `maiz2 (1).mp4` |

@@ -26,7 +26,7 @@ const seeds = [
   { slug: 'tomate', title: 'Tomate', scientificName: 'Solanum lycopersicum L.', videoFile: 'TOMATE.mp4', whiteVideoFile: 'TOMATE.mp4', videoScale: 0.9 },
   { slug: 'azafranero', title: 'Azafranero', videoFile: 'azafranero_semilla_360_negro_uniforme.mp4' },
   { slug: 'sarraceno', title: 'Sarraceno', videoFile: 'SARRACENO.mp4', whiteVideoFile: 'SARRACENO.mp4', videoScale: 0.78, titleLineGap: '1.3cqw' },
-  { slug: 'zanahoria_redonda', title: 'Zanahoria redonda', videoFile: 'zanahoria_redonda_360 (1).mp4', videoScale: 0.85 },
+  { slug: 'zanahoria_redonda', title: 'Zanahoria redonda', videoFile: 'daucus-carota-compatible.mp4', whiteVideoFile: 'daucus-carota-blanco.mp4', videoScale: 0.85 },
   { slug: 'faba_vino', title: 'Faba de vino', videoFile: 'FABA VINO.mp4', whiteVideoFile: 'FABA VINO.mp4' },
   { slug: 'altramuz', aliases: ['semilla_provisional'], title: 'Altramuz azul', videoFile: 'One-uncut-photoreal-macro-turntable-of-O.mp4', videoScale: 0.7 },
   { slug: 'panis', aliases: ['maiz2'], title: "Panís d’ensalat", videoFile: 'maiz2 (1).mp4', whiteVideoFile: 'maiz2 (1).mp4', videoScale: 0.7 },

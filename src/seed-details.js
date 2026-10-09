@@ -10,7 +10,7 @@ export const seedDetails = {
       "genus": "Vicia",
       "species": "Vicia articulata Hornem.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "algarroba",
+      "commonNames": "Algarroba",
       "averageSize": "6 milímetros",
       "usesTitle": "Usos",
       "uses": "Se ha utilizado sobre todo como alimento para el ganado, si bien en tiempo de necesidad también se usó para el consumo humano.",
@@ -29,7 +29,7 @@ export const seedDetails = {
       "genus": "Brassica",
       "species": "Brassica rapa L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "nabo, colinabo",
+      "commonNames": "Nabo, colinabo",
       "averageSize": "2,54 milímetros",
       "usesTitle": "Usos",
       "uses": "Se aprovechan para consumo humano la raíz (nabo), las hojas (nabiza) y los tallos con hojas antes de florecer (grelos).",
@@ -56,13 +56,13 @@ export const seedDetails = {
       "collectedAt": "Lena (Asturias)",
       "depositedOn": "09/06/2022",
       "originTitle": "Origen",
-      "origin": "La especie procede de América y llegó a Europa con los españoles en el siglo XVI. La faba güeyín es una variedad tradicional de Asturias.",
+      "origin": "La especie procede de América y llegó a Europa con los españoles en el siglo XVI. La *faba güeyín* es una variedad tradicional de Asturias.",
       "sources": [
         "INVENTARIO NACIONAL DE RECURSOS FITOGENÉTICOS PARA LA AGRICULTURA Y LA ALIMENTACIÓN",
         "SERVICIO REGIONAL DE INVESTIGACIÓN Y DESARROLLO AGROALIMENTARIO (SERIDA)"
       ]
     },
-    "subtitleName": "Faba güeyin"
+    "subtitleName": "Faba güeyín"
   },
   "escanda": {
     "scientificName": "Triticum aestivum L.",
@@ -113,7 +113,7 @@ export const seedDetails = {
       "genus": "Pisum",
       "species": "Pisum sativum L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "guisante",
+      "commonNames": "Guisante",
       "averageSize": "7,5 milímetros",
       "usesTitle": "Uso",
       "uses": "Los guisantes secos suelen destinarse a consumo animal y los verdes para consumo humano. De algunas variedades de guisante se come también la vaina verde.",
@@ -132,7 +132,7 @@ export const seedDetails = {
       "genus": "Solanum",
       "species": "Solanum melongena L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "berenjena",
+      "commonNames": "Berenjena",
       "averageSize": "4 milímetros",
       "usesTitle": "Uso",
       "uses": "Las semillas se encuentran en el interior del fruto, comestible, que se caracteriza por diversos colores según la variedad.",
@@ -140,7 +140,7 @@ export const seedDetails = {
       "collectedAt": "Maó-Mahón (Menorca)",
       "depositedOn": "09/06/2022",
       "originTitle": "Origen",
-      "origin": "Su cultivo se inició en el sudeste asiático. Su nombre común procede del vocablo persa badindjan. Se introdujo en Europa a través de Al-Ándalus. La berenjena está emparentada con el tomate y el tabaco, los tres pertenecen la familia Solanaceae."
+      "origin": "Su cultivo se inició en el sudeste asiático. Se introdujo en Europa a través de Al-Ándalus. La berenjena está emparentada con el tomate y el tabaco; su nombre común procede del vocablo persa *badindjan*. Los tres pertenecen a la familia Solanaceae."
     },
     "subtitleName": "Alberginia"
   },
@@ -151,7 +151,7 @@ export const seedDetails = {
       "genus": "Hordeum",
       "species": "Hordeum vulgare L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "cebada",
+      "commonNames": "Cebada",
       "averageSize": "10 milímetros",
       "usesTitle": "Uso",
       "uses": "Tanto el grano como la planta entera se utilizan en alimentación animal. La variedad de ciclo corto se cosecha en aproximadamente tres meses, de ahí su nombre (tremesina).",
@@ -159,7 +159,7 @@ export const seedDetails = {
       "collectedAt": "Nolay (Soria)",
       "depositedOn": "25/02/2022",
       "originTitle": "Origen",
-      "origin": "Es endémica de las regiones del Próximo Oriente y del Mediterráneo, donde fue domesticada en el periodo neolítico."
+      "origin": "Es endémica de las regiones del Próximo Oriente y del Mediterráneo, donde fue domesticada en el Periodo Neolítico."
     },
     "subtitleName": "Cebada tremesina"
   },
@@ -170,7 +170,7 @@ export const seedDetails = {
       "genus": "Sorghum",
       "species": "Sorghum bicolor (L.) Moench",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "sorgo",
+      "commonNames": "Sorgo",
       "averageSize": "5,5 milímetros",
       "usesTitle": "Uso",
       "uses": "Sus panojas servían para fabricar escobas, de ahí su nombre “escoba de año”.",
@@ -189,7 +189,7 @@ export const seedDetails = {
       "genus": "Fagopyrum",
       "species": "Fagopyrum esculentum Moench",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "trigo sarraceno, alforfón",
+      "commonNames": "Trigo sarraceno, alforfón",
       "averageSize": "6 milímetros",
       "usesTitle": "Uso",
       "uses": "Aunque se considera un cereal no lo es. Su harina es apta para dietas sin gluten y tiene una proteína de excelente calidad. Actualmente se está recuperando su cultivo.",
@@ -208,15 +208,15 @@ export const seedDetails = {
       "genus": "Allium",
       "species": "Allium cepa L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "cebolla",
+      "commonNames": "Cebolla",
       "averageSize": "3 milímetros",
       "usesTitle": "Variedades tradicionales",
-      "uses": "Existe una gran variedad debido a la necesidad de adaptación. El Inventario Nacional de Recursos Fitogenéticos recoge información de más de 800 variedades tradicionales de cebolla de origen español.",
+      "uses": "El Inventario Nacional de Recursos Fitogenéticos recoge información de más de 800 variedades tradicionales de cebolla de origen español.",
       "collectedOn": "09/10/1996",
       "collectedAt": "Bernedo (Álava)",
       "depositedOn": "28/05/2024",
       "originTitle": "Origen",
-      "origin": "Es una de las hortalizas cultivadas más antiguas, registrada por primera vez en Asia Central hace más de 4000 años y actualmente, es el segundo cultivo hortícola más importante."
+      "origin": "Es una de las hortalizas cultivadas más antiguas. Registrada por primera vez en Asia Central hace más de 4000 años, actualmente es el segundo cultivo hortícola más importante."
     },
     "subtitleName": "Cebolla babosa"
   },
@@ -227,7 +227,7 @@ export const seedDetails = {
       "genus": "Zea",
       "species": "Zea mays L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "Maíz",
+      "commonNames": "Maíz de secano",
       "averageSize": "9 milímetros",
       "usesTitle": "Usos",
       "uses": "En España su uso se ha diversificado mucho, aunque el más habitual es el consumo animal. La mayor parte de la producción se concentra en el noroeste del país.",
@@ -235,9 +235,9 @@ export const seedDetails = {
       "collectedAt": "Cilleros (Cáceres)",
       "depositedOn": "09/06/2022",
       "originTitle": "Origen",
-      "origin": "La evidencia más antigua del maíz como alimento humano se encuentra en lugares arqueológicos de México, donde se encontraron pequeñas mazorcas de más de 5 000 años de antigüedad."
+      "origin": "La evidencia más antigua del maíz como alimento humano se encuentra en lugares arqueológicos de México, donde se encontraron pequeñas mazorcas de más de 5000 años de antigüedad."
     },
-    "subtitleName": "Maíz"
+    "subtitleName": "Maíz de secano"
   },
   "tomate": {
     "scientificName": "Solanum lycopersicum L.",
@@ -246,7 +246,7 @@ export const seedDetails = {
       "genus": "Solanum",
       "species": "Solanum lycopersicum L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "tomate",
+      "commonNames": "Tomate",
       "averageSize": "2,2 milímetros",
       "usesTitle": "Variedades tradicionales",
       "uses": "En el Inventario Nacional de Recursos Fitogenéticos se recogen más de 2400 entradas de variedades tradicionales de tomate.",
@@ -265,7 +265,7 @@ export const seedDetails = {
       "genus": "Cynara",
       "species": "Cynara cardunculus L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "cardo",
+      "commonNames": "Cardo",
       "averageSize": "8,8 milímetros",
       "usesTitle": "Usos",
       "uses": "Su consumo durante las fiestas de Navidad es habitual en varias regiones de España. Se preparan sus pencas o tallos, generalmente cocidos.",
@@ -284,10 +284,10 @@ export const seedDetails = {
       "genus": "Lupinus",
       "species": "Lupinus angustifolius L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "altramuz",
+      "commonNames": "Altramuz",
       "averageSize": "7,5 milímetros",
       "usesTitle": "Variedad silvestre",
-      "uses": "En esta especie hay formas silvestres, adaptadas a suelos ácidos y pobres. La conservación de variedades silvestres es fundamental para mantener la biodiversidad y garantizar su supervivencia a largo plazo.",
+      "uses": "En esta especie hay formas silvestres adaptadas a suelos ácidos y pobres. La conservación de variedades silvestres es fundamental para mantener la biodiversidad y garantizar su supervivencia a largo plazo.",
       "collectedOn": "01/01/1978",
       "collectedAt": "Santa Cruz del Retamar (Toledo)",
       "depositedOn": "09/06/2022",
@@ -326,17 +326,17 @@ export const seedDetails = {
       "genus": "Zea",
       "species": "Zea mays L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "Maiz",
+      "commonNames": "Maíz",
       "averageSize": "9 milímetros",
       "usesTitle": "Variedad tradicional",
-      "uses": "En la Comunidad Valenciana se llama panís d’ensalat al grano de maíz tierno y dulce.",
+      "uses": "En la Comunidad Valenciana se llama *panís d’ensalat* al grano de maíz tierno y dulce.",
       "collectedOn": "02/12/2010",
       "collectedAt": "Els Rosildos, Sierra Engarcerán (Castellón)",
       "depositedOn": "25/02/2026",
       "originTitle": "Diversidad",
       "origin": "El maíz se cultiva tanto a nivel del mar como en altitudes de hasta 3800 metros y tiene una enorme cantidad de variedades locales."
     },
-    "subtitleName": "Panis d'ensalat"
+    "subtitleName": "Panís d’ensalat"
   },
   "azafranero": {
     "scientificName": "Carthamus tinctorius L.",
@@ -345,7 +345,7 @@ export const seedDetails = {
       "genus": "Carthamus",
       "species": "Carthamus tinctorius L.",
       "commonNamesLabel": "Nombre común",
-      "commonNames": "cártamo",
+      "commonNames": "Cártamo",
       "averageSize": "7 milímetros",
       "usesTitle": "Usos",
       "uses": "Las flores del cártamo se usaron tradicionalmente como colorante y en ocasiones se ha utilizado como sustituto barato del azafrán.",
@@ -353,7 +353,7 @@ export const seedDetails = {
       "collectedAt": "Tetir, Puerto del Rosario (Fuerteventura)",
       "depositedOn": "09/06/2022",
       "originTitle": "Origen",
-      "origin": "El cártamo es originario de Asia central. Es un cultivo tradicional en las Islas Canarias, donde se conoce popularmente como azafranero."
+      "origin": "El cártamo es originario de Asia Central. Es un cultivo tradicional en las Islas Canarias, donde se conoce popularmente como azafranero."
     },
     "subtitleName": "Azafranero"
   }

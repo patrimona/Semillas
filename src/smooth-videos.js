@@ -15,7 +15,7 @@ export const smoothVideos = {
   tomate: 'tomate-constante.mp4',
   azafranero: 'azafranero-fluido.mp4',
   sarraceno: 'sarraceno-constante.mp4',
-  zanahoria_redonda: 'zanahoria_redonda-fluido.mp4',
+  zanahoria_redonda: 'daucus-carota-blanco.mp4',
   faba_vino: 'faba_vino-fluido.mp4',
   altramuz: 'altramuz-fluido.mp4',
 }

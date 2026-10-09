@@ -32,7 +32,7 @@
   {
     "slug": "faba",
     "title": "Faba",
-    "subtitleName": "Faba güeyin"
+    "subtitleName": "Faba güeyín"
   },
   {
     "slug": "guisante",
@@ -42,7 +42,7 @@
   {
     "slug": "maiz",
     "title": "Maíz",
-    "subtitleName": "Maíz"
+    "subtitleName": "Maíz de secano"
   },
   {
     "slug": "mijo",
@@ -87,6 +87,6 @@
   {
     "slug": "panis",
     "title": "Panís d’ensalat",
-    "subtitleName": "Panis d'ensalat"
+    "subtitleName": "Panís d’ensalat"
   }
 ]
